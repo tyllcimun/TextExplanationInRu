@@ -46,12 +46,22 @@ enum class ErrorType {
 
     // Ошибки формата XML (атрибут "paramsCount")
     InvalidParamsCount, // У атрибута "paramsCount" указан неправильный формат данных
-
+    MissingCases,       // У описания отсутствует обязательный падеж
 };
 
 class TEException
 {
 public:
+
+    TEException(const ErrorType errorType, const QString &filename, const int line, const QList<QString> args = QList<QString>());
+    TEException(const ErrorType errorType, const int line, const QList<QString> args = QList<QString>());
+    TEException(const ErrorType errorType, const QString &filename, const QList<QString> args = QList<QString>());
+    TEException(const ErrorType errorType, const QList<QString> args = QList<QString>());
+
+    QString errorMessage() const;
+    ErrorType getErrorType() const;
+    int getLine() const;
+    QList<QString> getArgs() const;
 
 private:
 
