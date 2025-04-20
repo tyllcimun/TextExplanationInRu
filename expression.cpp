@@ -100,3 +100,51 @@ const Enum Expression::getEnumByName(QString name) const
     return getEnums()->value(name);
 }
 
+QString Expression::ToQstring()
+{
+    QString result = "Expression:   "  + this->expression;
+
+    result += "\nVariables:";
+    QHashIterator itV(this->variables);
+    while(itV.hasNext()) {
+        Variable val = itV.next().value();
+        result += "\n" + val.toQString("    ");
+    }
+
+    result += "\nFunctions:";
+    QHashIterator itF(this->functions);
+    while(itF.hasNext()) {
+        Function func = itF.next().value();
+        result += "\n" + func.toQString("    ");
+    }
+
+    result += "\nUnions:";
+    QHashIterator itU(this->unions);
+    while(itU.hasNext()) {
+        Union _union = itU.next().value();
+        result += "\n" + _union.toQString("    ");
+    }
+
+    result += "\nStructures:";
+    QHashIterator itS(this->structures);
+    while(itS.hasNext()) {
+        Structure structure = itS.next().value();
+        result += "\n" + structure.toQString("    ");
+    }
+
+    result += "\nClasses:";
+    QHashIterator itC(this->classes);
+    while(itC.hasNext()) {
+        Class _class = itC.next().value();
+        result += "\n" + _class.toQString("    ");
+    }
+
+    result += "\nEnums:";
+    QHashIterator itE(this->enums);
+    while(itE.hasNext()) {
+        Enum _enum = itE.next().value();
+        result += "\n" + _enum.toQString("    ");
+    }
+
+    return result;
+}

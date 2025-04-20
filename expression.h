@@ -10,6 +10,8 @@
 class Expression
 {
 public:
+    QString ToQstring();
+
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
 
