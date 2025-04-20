@@ -59,6 +59,8 @@ struct Variable {
     QString description;    // описание
 
     Variable(const QString& name = "", const QString& type = "", const QString& description = "");
+
+    QString toQString(const QString& startLine = "") const;
 };
 
 // Функция
@@ -70,6 +72,9 @@ struct Function {
     QString description;    // Описание
 
     Function(const QString& name = "", const QString& type = "", int paramsCount = 0, const QString& description = "");
+
+    QString toQString(const QString& startLine = "") const;
+
 };
 
 // Объединение
@@ -80,6 +85,8 @@ struct Union {
     QHash<QString, Function> functions;  // Методы
 
     Union(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+
+    QString toQString(const QString& startLine = "") const;
 };
 
 // Структура
@@ -90,6 +97,8 @@ struct Structure {
     QHash<QString, Function> functions;  // Методы
 
     Structure(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+
+    QString toQString(const QString& startLine = "") const;
 };
 
 // Класс
@@ -100,6 +109,8 @@ struct Class {
     QHash<QString, Function> functions;  // Методы
 
     Class(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+
+    QString toQString(const QString& startLine = "") const;
 };
 
 // Перечисление
@@ -109,6 +120,8 @@ struct Enum {
     QHash<QString, QString> values;  // Значения
 
     Enum(const QString& name = "", const QHash<QString, QString>& values = {});
+
+    QString toQString(const QString& startLine = "") const;
 };
 
 #endif // CODEENTITY_H
