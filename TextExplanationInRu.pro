@@ -1,4 +1,5 @@
-QT = core
+QT = core \
+     xml
 
 CONFIG += c++17 cmdline
 
@@ -9,6 +10,7 @@ CONFIG += c++17 cmdline
 SOURCES += \
         codeentity.cpp \
         expression.cpp \
+        expressionxmlparser.cpp \
         main.cpp \
         teexception.cpp
 
@@ -20,4 +22,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     codeentity.h \
     expression.h \
+    expressionxmlparser.h \
     teexception.h

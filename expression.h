@@ -10,6 +10,8 @@
 class Expression
 {
 public:
+
+    Expression(const QString inputXMLFile);
     QString ToQstring();
 
     void setExpression(const QString &newExpression);

@@ -46,6 +46,15 @@ int main(int argc, char *argv[])
 
 
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile){
+    try {
+        // Считать входной файл
+        Expression expr = Expression(inputFile);
+        // TODO: Получить объяснение выражения
+    }
+
+    catch(TEException exception) {
+        cout << exception.errorMessage();
+    }
 }
 void printHelpMessage(QTextStream& cout, const QString& filename)
 {
