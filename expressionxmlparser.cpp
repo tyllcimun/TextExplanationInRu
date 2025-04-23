@@ -26,7 +26,7 @@ QDomDocument ExpressionXmlParser::readXML(const QString& inputFilePath) {
 
     tmpFilePath->open();
     QString xmlContent = tmpFilePath->readAll();
-    // TODO: экранировать символы XML
+    xmlContent = fixXmlFlags(xmlContent);
 
     QDomDocument doc;
     QString errorMsg;
@@ -61,4 +61,79 @@ QTemporaryFile *ExpressionXmlParser::createTempCopy(const QString &sourceFilePat
     sourceFile.close();
 
     return tempFile;
+}
+
+QString ExpressionXmlParser::escapeXmlText(const QString& text) {
+
+    QString output = text;
+    output.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;");
+    return output;
+
+}
+
+QString ExpressionXmlParser::fixXmlFlags(const QString& xmlString) {
+
+    QString result = fixXmlExpression(xmlString);
+    result = fixXmlDescriptions(result);
+
+    return result;
+}
+
+QString ExpressionXmlParser::fixXmlExpression(const QString& xmlString) {
+    QString result = xmlString;
+
+    // Находим начало и конец тега <expression>
+    int expressionStart = result.indexOf("<expression>");
+    int expressionEnd = result.indexOf("</expression>");
+
+    // Если тег <expression> найден
+    if (expressionStart != -1 && expressionEnd != -1) {
+        // Вычисляем позиции содержимого
+        int contentStart = expressionStart + QString("<expression>").length();
+        int contentLength = expressionEnd - contentStart;
+
+        // Извлекаем содержимое
+        QString content = result.mid(contentStart, contentLength);
+
+        // Заменяем специальные символы
+        QString escapedContent = escapeXmlText(content);
+
+        // Заменяем оригинальное содержимое на обработанное
+        result.replace(contentStart, contentLength, escapedContent);
+    }
+
+    return result;
+}
+
+QString ExpressionXmlParser::fixXmlDescriptions(const QString& xmlString) {
+    QString result = xmlString;
+
+    // Обработка всех тегов <description> (с конца)
+    int descriptionEnd = result.length();
+    while ((descriptionEnd = result.lastIndexOf("</description>", descriptionEnd)) != -1) {
+        int descriptionStart = result.lastIndexOf("<description>", descriptionEnd);
+        if (descriptionStart == -1) break;
+
+        // Вычисляем позиции содержимого
+        int contentStart = descriptionStart + QString("<description>").length();
+        int contentLength = descriptionEnd - contentStart;
+
+        // Извлекаем содержимое
+        QString content = result.mid(contentStart, contentLength);
+
+        // Заменяем специальные символы
+        QString escapedContent = escapeXmlText(content);
+
+        // Заменяем оригинальное содержимое на обработанное
+        result.replace(contentStart, contentLength, escapedContent);
+
+        // Продолжаем поиск с предыдущей позиции
+        descriptionEnd = descriptionStart;
+    }
+
+    return result;
 }
