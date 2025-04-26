@@ -33,6 +33,26 @@ private:
     static QString fixXmlDescriptions(const QString& xmlString);
 
     //////////////////////////////////////////////////
+    /// Методы для обработки XML
+    /////////////////////////////////////////////////
+
+    static void parseQDomDocument(const QDomDocument& doc, Expression &expression);
+    static QString parseExpression(const QDomElement& _expression);
+
+
+    //////////////////////////////////////////////////
+    /// Методы для валидации XML элементов и атрибутов
+    /////////////////////////////////////////////////
+
+    static void validateElement(const QDomElement& curElement, const QList<QString>& allowedAttributes, const QHash<QString, int>& allowedElements, bool checkRequired = true, bool textIsError = true);
+    static void validateAttributes(const QDomElement& curElement, const QList<QString>& attributes);
+    static void validateChildElements(const QDomElement& curElement, const QHash<QString, int>& allowedElements);
+    static void validateRequiredAttributes(const QDomElement& curElement, const QList<QString>& attributes);
+    static void validateRequiredChildElements(const QDomElement& curElement, const QList<QString>& elements);
+    static int countDirectChildren(const QDomElement& element, const QString& childName);
+    static bool isLatinLetter(const QChar c);
+
+    //////////////////////////////////////////////////
     /// Константы
     /////////////////////////////////////////////////
 
