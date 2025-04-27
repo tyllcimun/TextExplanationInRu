@@ -10,7 +10,7 @@
 
 
 void printHelpMessage(QTextStream& cout, const QString& filename);
-void printExpanssion(QTextStream& cout, const QString& inputFile, const QString& outputFile);
+void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QString& outputFile);
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile);
 
 
@@ -33,8 +33,10 @@ int main(int argc, char *argv[])
     }
     // Если аргумента три и второй не начинается с "-"
     else if(argc == 3 && !QString(argv[2]).startsWith("-")) {
+        printExpressionInfo(cout, argv[1], argv[2]);
+
         // Получить объяснение выражения
-        printExplanation(cout, argv[1], argv[2]);
+        // printExplanation(cout, argv[1], argv[2]);
     }
     else {
         cout << ("Ошибка в синтаксисе команды. Подробнее: .\\" + fileName +  " -help");
@@ -56,6 +58,18 @@ void printExplanation(QTextStream& cout, const QString& inputFile, const QString
         cout << exception.errorMessage();
     }
 }
+
+void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QString& outputFile){
+
+    try {
+        Expression expr = Expression(inputFile);
+        cout << expr.ToQstring();
+    }
+    catch(TEException exception) {
+        cout << exception.errorMessage();
+    }
+}
+
 void printHelpMessage(QTextStream& cout, const QString& filename)
 {
     cout << ".\\" + filename + " [-help | -test] [input-file] [output-file]\n";
