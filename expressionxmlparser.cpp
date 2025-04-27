@@ -147,7 +147,19 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
 
     validateElement(root, QList<QString>{}, QHash<QString, int>{{"expression", 1}, {"variables", 1}, {"functions", 1}, {"unions", 1}, {"structures", 1}, {"classes", 1}, {"enums", 1}});
 
+    expression.setExpression(parseExpression(root.firstChildElement("expression")));
     //TODO реализовать парсинг элементов
+}
+
+QString ExpressionXmlParser::parseExpression(const QDomElement &_expression)
+{
+    QString res = _expression.text();
+    if(res.isEmpty() || res.length() < 1)
+        throw TEException(ErrorType::EmptyElementValue, _expression.lineNumber());
+
+    if(res.length() > expressionMaxLength) throw TEException(ErrorType::InputSizeExceeded, _expression.lineNumber(), QList<QString>{"description", QString::number(res.length()), QString::number(expressionMaxLength)});
+
+    return res;
 }
 
 void ExpressionXmlParser::validateElement(const QDomElement& curElement, const QList<QString>& allowedAttributes, const QHash<QString, int>& allowedElements, bool checkRequired, bool textIsError) {
