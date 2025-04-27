@@ -78,7 +78,7 @@ QString ExpressionXmlParser::escapeXmlText(const QString& text) {
 QString ExpressionXmlParser::fixXmlFlags(const QString& xmlString) {
 
     QString result = fixXmlExpression(xmlString);
-    result = fixXmlDescriptions(result);
+    result = fixXmlCaseTags(result);
 
     return result;
 }
@@ -109,18 +109,18 @@ QString ExpressionXmlParser::fixXmlExpression(const QString& xmlString) {
     return result;
 }
 
-QString ExpressionXmlParser::fixXmlDescriptions(const QString& xmlString) {
+QString ExpressionXmlParser::fixXmlCaseTags(const QString& xmlString) {
     QString result = xmlString;
 
-    // Обработка всех тегов <description> (с конца)
-    int descriptionEnd = result.length();
-    while ((descriptionEnd = result.lastIndexOf("</description>", descriptionEnd)) != -1) {
-        int descriptionStart = result.lastIndexOf("<description>", descriptionEnd);
-        if (descriptionStart == -1) break;
+    // Обработка всех тегов <case> (с конца)
+    int caseEnd = result.length();
+    while ((caseEnd = result.lastIndexOf("</case>", caseEnd)) != -1) {
+        int caseStart = result.lastIndexOf("<case", caseEnd);
+        if (caseStart == -1) break;
 
-        // Вычисляем позиции содержимого
-        int contentStart = descriptionStart + QString("<description>").length();
-        int contentLength = descriptionEnd - contentStart;
+        // Найдём начало содержимого, игнорируя атрибуты внутри <case>
+        int contentStart = result.indexOf('>', caseStart) + 1;
+        int contentLength = caseEnd - contentStart;
 
         // Извлекаем содержимое
         QString content = result.mid(contentStart, contentLength);
@@ -132,7 +132,7 @@ QString ExpressionXmlParser::fixXmlDescriptions(const QString& xmlString) {
         result.replace(contentStart, contentLength, escapedContent);
 
         // Продолжаем поиск с предыдущей позиции
-        descriptionEnd = descriptionStart;
+        caseEnd = caseStart;
     }
 
     return result;

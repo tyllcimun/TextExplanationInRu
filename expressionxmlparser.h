@@ -30,7 +30,7 @@ private:
     static QString escapeXmlText(const QString& text);
     static QString fixXmlFlags(const QString& xmlString);
     static QString fixXmlExpression(const QString& xmlString);
-    static QString fixXmlDescriptions(const QString& xmlString);
+    static QString fixXmlCaseTags(const QString& xmlString);
 
     //////////////////////////////////////////////////
     /// Методы для обработки XML
