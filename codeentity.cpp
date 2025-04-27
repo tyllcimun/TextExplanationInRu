@@ -1,6 +1,6 @@
 #include "codeentity.h"
 
-Variable::Variable(const QString &name, const QString &type, const QString &description)
+Variable::Variable(const QString &name, const QString &type, const QHash<Case, QString> &description)
     : name(name), type(type), description(description) {}
 
 QString Variable::toQString(const QString& startLine) const {
@@ -8,12 +8,12 @@ QString Variable::toQString(const QString& startLine) const {
     QString result = startLine + "Variable:";
     result += "  name: " +          this->name;
     result += ";  type: " +         this->type;
-    result += ";  description: " +  this->description;
+    result += ";  description: " +  this->description.value(Case::Nominative);
 
     return result;
 }
 
-Function::Function(const QString &name, const QString &type, int paramsCount, const QString &description)
+Function::Function(const QString &name, const QString &type, int paramsCount, const QHash<Case, QString> &description)
     : name(name), type(type), paramsCount(paramsCount), description(description) {}
 
 QString Function::toQString(const QString& startLine) const {
@@ -21,7 +21,7 @@ QString Function::toQString(const QString& startLine) const {
     QString result = startLine + "Function:";
     result += "  name: " +          this->name;
     result += ";  type: " +         this->type;
-    result += ";  description: " +  this->description;
+    result += ";  description: " +  this->description.value(Case::Nominative);
 
     return result;
 }
@@ -83,7 +83,7 @@ QString Class::toQString(const QString& startLine) const {
     return result;
 }
 
-Enum::Enum(const QString &name, const QHash<QString, QString> &values)
+Enum::Enum(const QString &name, const QHash<QString, QHash<Case, QString> > &values)
     : name(name), values(values) {}
 
 QString Enum::toQString(const QString& startLine) const {
@@ -94,7 +94,7 @@ QString Enum::toQString(const QString& startLine) const {
     QHashIterator itV(this->values);
     while(itV.hasNext()) {
         auto v = itV.next();
-        result += "\n   " + startLine + v.key() + ": " + v.value();
+        result += "\n   " + startLine + v.key() + ": " + v.value().value(Case::Nominative);
     }
     return result;
 }
