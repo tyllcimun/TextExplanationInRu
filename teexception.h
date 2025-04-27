@@ -29,6 +29,7 @@ enum class ErrorType {
     // Ошибки формата XML (элемент <expression>)
     UndefinedId,                // Используется переменная, функция или пользовательский тип, которые отсутствуют в соответствующих элементах
     InvalidSymbol,              // В выражении присутствует недопустимый символ
+    InputDataExprSizeExceeded,  // В выражении превышен допустимый размер входных данных
     MissingOperand,             // Для операции отсутствует необходимое количество операндов
     MissingOperations,          // Для операнда отсутствует необходимое количество операций
     MultipleIncrementDecrement, // Используется более одного инкремента или декремента для одной и той же переменной
@@ -46,7 +47,9 @@ enum class ErrorType {
 
     // Ошибки формата XML (атрибут "paramsCount")
     InvalidParamsCount, // У атрибута "paramsCount" указан неправильный формат данных
+    // Ошибки формата XML (элемент <description>)
     MissingCases,       // У описания отсутствует обязательный падеж
+    UnexpectedCaseType     // У элемента case отсутствует ожидаемое значение аттрибута type
 };
 
 class TEException

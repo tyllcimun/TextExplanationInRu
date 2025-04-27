@@ -85,6 +85,9 @@ QString TEException::errorMessage() const
     case ErrorType::InvalidSymbol:
         message += "в значении элемента <expression> обнаружен символ \"{1}\".";
         break;
+    case ErrorType::InputDataExprSizeExceeded:
+        message += "в значении элемента <expression> превышено допустимое количество операций. Текущее - {1}, ожидается - 20.";
+        break;
     case ErrorType::MissingOperand:
         message += "в значении элемента <expression>, у операнда \"{1}\" отсутствует операция.";
         break;
@@ -112,6 +115,10 @@ QString TEException::errorMessage() const
     case ErrorType::MissingCases:
         message += "в элементе <description> отсутствует <case> с атрибутом “type” со значением \"{1}\".";
         break;
+    case ErrorType::UnexpectedCaseType:
+        message += "в элементе <case> получено значение атрибута “type” \"{1}\". Ожидается \"{2}\".";
+        break;
+
     default:
         message += "unknown error";
         break;
