@@ -148,6 +148,7 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
     validateElement(root, QList<QString>{}, QHash<QString, int>{{"expression", 1}, {"variables", 1}, {"functions", 1}, {"unions", 1}, {"structures", 1}, {"classes", 1}, {"enums", 1}});
 
     expression.setExpression(parseExpression(root.firstChildElement("expression")));
+    expression.setVariables(parseVariables(root.firstChildElement("variables")));
     //TODO реализовать парсинг элементов
 }
 
@@ -160,6 +161,45 @@ QString ExpressionXmlParser::parseExpression(const QDomElement &_expression)
     if(res.length() > expressionMaxLength) throw TEException(ErrorType::InputSizeExceeded, _expression.lineNumber(), QList<QString>{"description", QString::number(res.length()), QString::number(expressionMaxLength)});
 
     return res;
+}
+
+QHash<QString, Variable> ExpressionXmlParser::parseVariables(const QDomElement &_variables)
+{
+    validateElement(_variables, QList<QString>{}, QHash<QString, int>{{"variable", childElementsMaxCount}}, false);
+
+    QHash<QString, Variable> result;
+    if(_variables.childNodes().isEmpty()) return result;
+
+    QDomNode childNode = _variables.firstChild();
+    while (!childNode.isNull()) {
+
+        Variable child = parseVariable(childNode.toElement());
+        result.insert(child.name, child);
+        childNode = childNode.nextSibling();
+    }
+
+    return result;
+}
+
+Variable ExpressionXmlParser::parseVariable(const QDomElement &_variable)
+{
+    validateElement(_variable, QList<QString>{"name", "type"}, QHash<QString, int>{{"description", 1}}, true);
+
+    QString name = parseName(_variable);
+    QString type = _variable.attribute("type");
+    QHash<Case, QString> desc = parseCases(_variable.firstChildElement("description"));
+
+    return Variable(name, type, desc);
+}
+
+QString ExpressionXmlParser::parseName(const QDomElement &element) {
+    QString res = element.attribute("name");
+    return res;
+}
+QHash<Case, QString> ExpressionXmlParser::parseCases(const QDomElement &parentElement)
+{
+    QHash<Case, QString> cases;
+    return cases;
 }
 
 void ExpressionXmlParser::validateElement(const QDomElement& curElement, const QList<QString>& allowedAttributes, const QHash<QString, int>& allowedElements, bool checkRequired, bool textIsError) {

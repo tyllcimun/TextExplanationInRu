@@ -39,6 +39,23 @@ private:
     static void parseQDomDocument(const QDomDocument& doc, Expression &expression);
     static QString parseExpression(const QDomElement& _expression);
 
+    // ₋	от 0 до 20 переменных;
+    static QHash<QString, Variable> parseVariables(const QDomElement& _variables);
+    static Variable parseVariable(const QDomElement& _variable);
+
+    // ₋	от 0 до 256 символов для переменных;
+    // ₋	от 0 до 256 символов для функции;
+    // ₋	от 0 до 256 символов для параметров пользовательских типов;
+    static QHash<Case, QString> parseCases(const QDomElement &parentElement);
+
+    // ₋	от 1 до 32 символов для имени переменной;
+    // ₋	от 1 до 32 символов для имени функции;
+    // ₋	от 1 до 32 символов для имени параметра функции;
+    // ₋	от 1 до 32 символов для имени пользовательских типов;
+    // ₋	от 1 до 32 символов для имени параметров пользовательских типов;
+    //Названия всех переменных, функций и пользовательских типов должны быть уникальны. Названия должны начинаться с латинской буквы или спец символ ‘_’ (нижнее подчеркивание),
+    //содержать только цифры от 0 до 9 включительно, все буквы латинского алфавита и спец символ ‘_’ (нижнее подчеркивание).
+    static QString parseName(const QDomElement& element);
 
     //////////////////////////////////////////////////
     /// Методы для валидации XML элементов и атрибутов
