@@ -161,7 +161,7 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
     expression.setStructures(parseStructures(root.firstChildElement("structures")));
     expression.setClasses(parseClasses(root.firstChildElement("classes")));
     expression.setEnums(parseEnums(root.firstChildElement("enums")));
-    //TODO реализовать парсинг элементов
+    expression.setUnions(parseUnions(root.firstChildElement("unions")));
 }
 
 QString ExpressionXmlParser::parseExpression(const QDomElement &_expression)
@@ -349,6 +349,40 @@ QHash<QString, QHash<Case, QString>> ExpressionXmlParser::parseEnumValues(const 
     }
 
     return result;
+}
+
+QHash<QString, Union> ExpressionXmlParser::parseUnions(const QDomElement &_unions)
+{
+    validateElement(_unions, QList<QString>{}, QHash<QString, int>{{"union", childElementsMaxCount}}, false);
+
+    QHash<QString, Union> result;
+    if(_unions.childNodes().isEmpty()) return result;
+
+    QDomNode childNode = _unions.firstChild();
+    while (!childNode.isNull()) {
+
+        Union child = parseUnion(childNode.toElement());
+        result.insert(child.name, child);
+
+        childNode = childNode.nextSibling();
+    }
+
+    return result;
+}
+
+Union ExpressionXmlParser::parseUnion(const QDomElement &_union)
+{
+    validateElement(_union, QList<QString>{"name"}, QHash<QString, int>{{"variables", 1}, {"functions", 1}}, true);
+
+    QString name = parseName(_union);
+    QHash<QString, Variable> variables = parseVariables(_union.firstChildElement("variables"));
+    QHash<QString, Function> functions = parseFunctions(_union.firstChildElement("functions"));
+
+    int elementsCount = variables.count() + functions.count();
+    if(elementsCount > childElementsMaxCount)
+        throw TEException(ErrorType::InputSizeExceeded, _union.lineNumber(), QList<QString>{QString::number(elementsCount), QString::number(elementsCount), QString::number(childElementsMaxCount)});
+
+    return Union(name, variables, functions);
 }
 
 QString ExpressionXmlParser::parseName(const QDomElement &element) {

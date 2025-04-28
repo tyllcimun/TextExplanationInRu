@@ -63,6 +63,11 @@ private:
     static Enum parseEnum(const QDomElement& _enum);
     static QHash<QString, QHash<Case, QString> > parseEnumValues(const QDomElement& _values);
 
+    // ₋	от 0 до 20 пользовательских типов;
+    static QHash<QString, Union> parseUnions(const QDomElement& _unions);
+    // ₋	от 0 до 20 параметров у каждого пользовательского типа;
+    static Union parseUnion(const QDomElement& _union);
+
     // ₋	от 0 до 256 символов для переменных;
     // ₋	от 0 до 256 символов для функции;
     // ₋	от 0 до 256 символов для параметров пользовательских типов;
