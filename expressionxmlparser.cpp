@@ -159,6 +159,7 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
     expression.setVariables(parseVariables(root.firstChildElement("variables")));
     expression.setFunctions(parseFunctions(root.firstChildElement("functions")));
     expression.setStructures(parseStructures(root.firstChildElement("structures")));
+    expression.setClasses(parseClasses(root.firstChildElement("classes")));
     //TODO реализовать парсинг элементов
 }
 
@@ -265,6 +266,40 @@ Structure ExpressionXmlParser::parseStructure(const QDomElement &_structure)
         throw TEException(ErrorType::InputSizeExceeded, _structure.lineNumber(), QList<QString>{QString::number(elementsCount), QString::number(elementsCount), QString::number(childElementsMaxCount)});
 
     return Structure(name, variables, functions);
+}
+
+QHash<QString, Class> ExpressionXmlParser::parseClasses(const QDomElement &_classes)
+{
+    validateElement(_classes, QList<QString>{}, QHash<QString, int>{{"class", childElementsMaxCount}}, false);
+
+    QHash<QString, Class> result;
+    if(_classes.childNodes().isEmpty()) return result;
+
+    QDomNode childNode = _classes.firstChild();
+    while (!childNode.isNull()) {
+
+        Class child = parseClass(childNode.toElement());
+        result.insert(child.name, child);
+
+        childNode = childNode.nextSibling();
+    }
+
+    return result;
+}
+
+Class ExpressionXmlParser::parseClass(const QDomElement &_class)
+{
+    validateElement(_class, QList<QString>{"name"}, QHash<QString, int>{{"variables", 1}, {"functions", 1}}, true);
+
+    QString name = parseName(_class);
+    QHash<QString, Variable> variables = parseVariables(_class.firstChildElement("variables"));
+    QHash<QString, Function> functions = parseFunctions(_class.firstChildElement("functions"));
+
+    int elementsCount = variables.count() + functions.count();
+    if(elementsCount > childElementsMaxCount)
+        throw TEException(ErrorType::InputSizeExceeded, _class.lineNumber(), QList<QString>{QString::number(elementsCount), QString::number(elementsCount), QString::number(childElementsMaxCount)});
+
+    return Class(name, variables, functions);
 }
 
 QString ExpressionXmlParser::parseName(const QDomElement &element) {

@@ -51,6 +51,12 @@ private:
     static QHash<QString, Structure> parseStructures(const QDomElement& _structures);
     // ₋	от 0 до 20 параметров у каждого пользовательского типа;
     static Structure parseStructure(const QDomElement& _structure);
+
+    // ₋	от 0 до 20 пользовательских типов;
+    static QHash<QString, Class> parseClasses(const QDomElement& _classes);
+    // ₋	от 0 до 20 параметров у каждого пользовательского типа;
+    static Class parseClass(const QDomElement& _class);
+
     // ₋	от 0 до 256 символов для переменных;
     // ₋	от 0 до 256 символов для функции;
     // ₋	от 0 до 256 символов для параметров пользовательских типов;
