@@ -160,6 +160,7 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
     expression.setFunctions(parseFunctions(root.firstChildElement("functions")));
     expression.setStructures(parseStructures(root.firstChildElement("structures")));
     expression.setClasses(parseClasses(root.firstChildElement("classes")));
+    expression.setEnums(parseEnums(root.firstChildElement("enums")));
     //TODO реализовать парсинг элементов
 }
 
@@ -300,6 +301,54 @@ Class ExpressionXmlParser::parseClass(const QDomElement &_class)
         throw TEException(ErrorType::InputSizeExceeded, _class.lineNumber(), QList<QString>{QString::number(elementsCount), QString::number(elementsCount), QString::number(childElementsMaxCount)});
 
     return Class(name, variables, functions);
+}
+
+QHash<QString, Enum> ExpressionXmlParser::parseEnums(const QDomElement &_enums)
+{
+    validateElement(_enums, QList<QString>{}, QHash<QString, int>{{"enum", 20}}, false);
+
+    QHash<QString, Enum> result;
+    if(_enums.childNodes().isEmpty()) return result;
+
+    QDomNode childNode = _enums.firstChild();
+    while (!childNode.isNull()) {
+
+        Enum child = parseEnum(childNode.toElement());
+        result.insert(child.name, child);
+
+        childNode = childNode.nextSibling();
+    }
+
+    return result;
+}
+
+Enum ExpressionXmlParser::parseEnum(const QDomElement &_enum)
+{
+    validateElement(_enum, QList<QString>{"name"}, QHash<QString, int>{{"value", 20}}, true);
+
+    QString name = parseName(_enum);
+    QHash<QString, QHash<Case, QString>> values = parseEnumValues(_enum);
+
+    return Enum(name, values);
+}
+
+QHash<QString, QHash<Case, QString>> ExpressionXmlParser::parseEnumValues(const QDomElement &_values)
+{
+    QHash<QString, QHash<Case, QString>> result;
+    // Перебираем все элементы <value> внутри <enum>
+    QDomNodeList valueNodes = _values.elementsByTagName("value");
+    for (int i = 0; i < valueNodes.size(); ++i) {
+        QDomElement valueElement = valueNodes.at(i).toElement();
+
+        validateElement(valueElement, QList<QString>{"name"}, QHash<QString, int>{{"description", 1}}, true);
+
+        QString valueName = valueElement.attribute("name");
+        QHash<Case, QString> description = parseCases(valueElement.firstChildElement("description"));
+
+        result.insert(valueName, description);
+    }
+
+    return result;
 }
 
 QString ExpressionXmlParser::parseName(const QDomElement &element) {

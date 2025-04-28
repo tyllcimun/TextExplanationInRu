@@ -57,6 +57,12 @@ private:
     // ₋	от 0 до 20 параметров у каждого пользовательского типа;
     static Class parseClass(const QDomElement& _class);
 
+    // ₋	от 0 до 20 пользовательских типов;
+    static QHash<QString, Enum> parseEnums(const QDomElement& _enums);
+    // ₋	от 0 до 20 параметров у каждого пользовательского типа;
+    static Enum parseEnum(const QDomElement& _enum);
+    static QHash<QString, QHash<Case, QString> > parseEnumValues(const QDomElement& _values);
+
     // ₋	от 0 до 256 символов для переменных;
     // ₋	от 0 до 256 символов для функции;
     // ₋	от 0 до 256 символов для параметров пользовательских типов;
