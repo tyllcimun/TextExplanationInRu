@@ -203,8 +203,25 @@ Variable ExpressionXmlParser::parseVariable(const QDomElement &_variable)
 
 QString ExpressionXmlParser::parseName(const QDomElement &element) {
     QString res = element.attribute("name");
+    if(res.isEmpty() || res.length() < 1) throw TEException(ErrorType::EmptyAttributeName);
+    if(res.length() > nameMaxLength) throw TEException(ErrorType::InputSizeExceeded, element.lineNumber(), QList<QString>{"name", QString::number(res.length()), QString::number(nameMaxLength)});
+
+    // Первый символ - латинская буква или _
+    const QChar first = res[0];
+    if (!(isLatinLetter(first) || first == '_')) {
+        throw TEException(ErrorType::InvalidName, element.lineNumber());
+    }
+
+    // Остальные символы - латинские буквы, цифры или _
+    for(int i = 0; i < res.length(); i++) {
+        if (!(isLatinLetter(res[i]) || res[i].isDigit() || res[i] == '_')) {
+            throw TEException(ErrorType::InvalidName, element.lineNumber(), QList<QString>{res});
+        }
+    }
+
     return res;
 }
+
 QHash<Case, QString> ExpressionXmlParser::parseCases(const QDomElement &parentElement)
 {
     QHash<Case, QString> cases;
@@ -221,6 +238,11 @@ QHash<Case, QString> ExpressionXmlParser::parseCases(const QDomElement &parentEl
     }
 
     return cases;
+}
+
+bool ExpressionXmlParser::isLatinLetter(const QChar c) {
+    // Явная проверка латинских букв
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
 void ExpressionXmlParser::validateElement(const QDomElement& curElement, const QList<QString>& allowedAttributes, const QHash<QString, int>& allowedElements, bool checkRequired, bool textIsError) {
