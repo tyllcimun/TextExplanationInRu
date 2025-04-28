@@ -78,6 +78,7 @@ private:
     static constexpr int expressionMaxLength = 1024;
     static constexpr int childElementsMaxCount = 20;
     static constexpr int functionParamsMaxCount = 5;
+    static const QHash<QString, Case> caseMapping;
 };
 
 #endif // EXPRESSIONXMLPARSER_H

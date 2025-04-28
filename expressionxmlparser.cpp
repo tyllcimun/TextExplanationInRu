@@ -3,6 +3,15 @@
 #include <QCoreApplication>
 #include <QDir>
 
+const QHash<QString, Case> ExpressionXmlParser::caseMapping = {
+    {"именительный", Case::Nominative},
+    {"родительный", Case::Genitive},
+    {"дательный", Case::Dative},
+    {"винительный", Case::Accusative},
+    {"творительный", Case::Instrumental},
+    {"предложный", Case::Prepositional}
+};
+
 void ExpressionXmlParser::readDataFromXML(const QString& inputFilePath, Expression &expression) {
 
     QDomDocument doc = readXML(inputFilePath);
@@ -199,6 +208,18 @@ QString ExpressionXmlParser::parseName(const QDomElement &element) {
 QHash<Case, QString> ExpressionXmlParser::parseCases(const QDomElement &parentElement)
 {
     QHash<Case, QString> cases;
+    QDomNodeList caseNodes = parentElement.elementsByTagName("case");
+
+    for (int i = 0; i < caseNodes.size(); i++) {
+        QDomElement caseElement = caseNodes.at(i).toElement();
+        QString caseType = caseElement.attribute("type").trimmed().toLower();
+
+        Case currentCase = caseMapping[caseType];
+        QString text = caseElement.text().trimmed();
+
+        cases.insert(currentCase, text);
+    }
+
     return cases;
 }
 
