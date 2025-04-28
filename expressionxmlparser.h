@@ -43,6 +43,10 @@ private:
     static QHash<QString, Variable> parseVariables(const QDomElement& _variables);
     static Variable parseVariable(const QDomElement& _variable);
 
+    // ₋	от 0 до 20 различных функций;
+    static QHash<QString, Function> parseFunctions(const QDomElement& _functions);
+    static Function parseFunction(const QDomElement& _function);
+
     // ₋	от 0 до 256 символов для переменных;
     // ₋	от 0 до 256 символов для функции;
     // ₋	от 0 до 256 символов для параметров пользовательских типов;

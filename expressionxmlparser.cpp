@@ -158,6 +158,7 @@ void ExpressionXmlParser::parseQDomDocument(const QDomDocument& doc, Expression 
 
     expression.setExpression(parseExpression(root.firstChildElement("expression")));
     expression.setVariables(parseVariables(root.firstChildElement("variables")));
+    expression.setFunctions(parseFunctions(root.firstChildElement("functions")));
     //TODO реализовать парсинг элементов
 }
 
@@ -199,6 +200,37 @@ Variable ExpressionXmlParser::parseVariable(const QDomElement &_variable)
     QHash<Case, QString> desc = parseCases(_variable.firstChildElement("description"));
 
     return Variable(name, type, desc);
+}
+
+QHash<QString, Function> ExpressionXmlParser::parseFunctions(const QDomElement &_functions)
+{
+    validateElement(_functions, QList<QString>{}, QHash<QString, int>{{"function", childElementsMaxCount}}, false);
+
+    QHash<QString, Function> result;
+    if(_functions.childNodes().isEmpty()) return result;
+
+    QDomNode childNode = _functions.firstChild();
+    while (!childNode.isNull()) {
+
+        Function child = parseFunction(childNode.toElement());
+        result.insert(child.name, child);
+
+        childNode = childNode.nextSibling();
+    }
+
+    return result;
+}
+
+Function ExpressionXmlParser::parseFunction(const QDomElement &_function)
+{
+    validateElement(_function, QList<QString>{"name", "type", "paramsCount"}, QHash<QString, int>{{"description", 1}}, true);
+
+    QString name = parseName(_function);
+    QString type = _function.attribute("type");
+    int paramsCount = _function.attribute("paramsCount").toInt();
+    QHash<Case, QString> desc = parseCases(_function.firstChildElement("description"));;
+
+    return Function(name, type, paramsCount, desc);
 }
 
 QString ExpressionXmlParser::parseName(const QDomElement &element) {
