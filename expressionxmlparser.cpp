@@ -43,7 +43,7 @@ QDomDocument ExpressionXmlParser::readXML(const QString& inputFilePath) {
 
     if (!doc.setContent(xmlContent, &errorMsg, &errorLine, &errorColumn)) {
         delete tmpFilePath;
-        throw TEException(ErrorType::Parssing, inputFilePath, errorLine);
+        throw TEException(ErrorType::Parsing, inputFilePath, errorLine);
     }
 
     delete tmpFilePath;

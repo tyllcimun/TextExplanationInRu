@@ -40,7 +40,7 @@ QString TEException::errorMessage() const
     case ErrorType::OutputFileCannotBeCreated:
         message += "Неверно указан путь к выходному файлу. Возможно, указанного расположения не существует или нет прав на запись.";
         break;
-    case ErrorType::Parssing:
+    case ErrorType::Parsing:
         message += "синтаксическая ошибка обнаружена в процессе обработки XML файла.";
         break;
     case ErrorType::MissingRootElemnt:
@@ -79,7 +79,7 @@ QString TEException::errorMessage() const
     case ErrorType::UndefinedId:
         message += "элемент \"{1}\" ни разу не встречается в элементе <expression>.";
         break;
-    case ErrorType::NewerUsedElement:
+    case ErrorType::NeverUsedElement:
         message += "идентификатор \"{1}\" в значении элемента <expression> не определен";
         break;
     case ErrorType::InvalidSymbol:
