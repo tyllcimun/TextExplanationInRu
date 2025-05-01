@@ -66,6 +66,7 @@ public:
     int getLine() const;
     QList<QString> getArgs() const;
 
+    QString replacePlaceholders(QString pattern, const QList<QString> args) const;
 private:
 
     ErrorType errorType; // Тип ошибки

@@ -129,7 +129,9 @@ QString TEException::errorMessage() const
         break;
     }
 
-    //TODO сделать функцию замены параметров в шаблонах
+    if(args.count() > 0) {
+        message = replacePlaceholders(message, this->args);
+    }
 
     return message;
 }
@@ -147,5 +149,17 @@ int TEException::getLine() const
 QList<QString> TEException::getArgs() const
 {
     return args;
+}
+
+QString TEException::replacePlaceholders(QString pattern, const QList<QString> args) const
+{
+    // Для каждого аргумента
+    for (int i = 0; i < args.size(); i++) {
+        // Формируем плейсхолдер вида {n} и т.д.
+        QString placeholder = "{" + QString::number(i + 1) + "}";
+        // Заменяем вхождение плейсхолдера на соответствующий ему аргумент
+        pattern.replace(placeholder, args[i]);
+    }
+    return pattern;
 }
 
