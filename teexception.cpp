@@ -23,7 +23,12 @@ TEException::TEException(const ErrorType errorType, const QList<QString> args)
 
 QString TEException::errorMessage() const
 {
-    QString message = "Ошибка: ";
+    QString message = "Ошибка ";
+
+    if(this->filename != "") message += " \"" + this->filename + "\" ";
+
+    if(this->line > 0) message += "строка: " + QString::number(this->line) + ": ";
+
 
     if(this->filename != ""){
         message += "\"" + this->filename + "\"" + (this->line > 0? " строка " + QString::number(this->line) : "") + ": ";
@@ -113,7 +118,7 @@ QString TEException::errorMessage() const
         message += "значение \"{1}\" атрибута \"paramsCount\" содержит неверное значение. Ожидается: положительное целое число от 0 до 20 включительно."; //НЕТУ
         break;
     case ErrorType::MissingCases:
-        message += "в элементе <description> отсутствует <case> с атрибутом “type” со значением \"{1}\".";
+        message += "в элементе <description> отсутствует <case> с атрибутом \"type\" со значением \"{1}\".";
         break;
     case ErrorType::UnexpectedCaseType:
         message += "в элементе <case> получено значение атрибута “type” \"{1}\". Ожидается \"{2}\".";
