@@ -156,13 +156,32 @@ QString Expression::ToQstring()
     return result;
 }
 
+QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const QString &className, OperationType parentOperType) const
+{
+    QHash<Case, QString> description = {};
+    return description;
+}
+
 QString Expression::getExplanationInRu()
 {
     //...Считать что объяснение пустое
     QString explanation = "";
     // Преобразовать выражение в дерево
+    ExpressionNode* explanationTree = this->expressionToNodes();
     // Получить объяснение выражения
-    // Удалить дубликаты слов в полученном выражении
+    explanation = this->toExplanation(explanationTree).value(Case::Nominative);
 
+    // Удалить дубликаты слов в полученном выражении
+    explanation = removeDuplicates(explanation);
     return explanation;
+}
+
+ExpressionNode *Expression::expressionToNodes()
+{
+
+}
+
+QString Expression::removeDuplicates(const QString &str)
+{
+    return str;
 }

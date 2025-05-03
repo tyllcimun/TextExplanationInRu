@@ -1,10 +1,11 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
-
-#include "codeentity.h"
+#include "expressionnode.h"
+#include "teexception.h"
 
 #include <QHash>
 #include <QString>
+#include <QStack>
 
 
 class Expression
@@ -13,8 +14,11 @@ public:
 
     Expression(const QString inputXMLFile);
     QString ToQstring();
+    QHash<Case, QString> toExplanation(const ExpressionNode *node, const QString& className = "", OperationType parentOperType = OperationType::None) const;
 
     QString getExplanationInRu();
+    ExpressionNode* expressionToNodes();
+    QString removeDuplicates(const QString &str);
 
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
