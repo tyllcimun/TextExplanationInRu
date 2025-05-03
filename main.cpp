@@ -55,7 +55,7 @@ void printExplanation(QTextStream& cout, const QString& inputFile, const QString
     }
 
     catch(TEException exception) {
-        cout << exception.errorMessage();
+        cout << exception.what();
     }
 }
 
@@ -66,7 +66,7 @@ void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QStr
         cout << expr.ToQstring();
     }
     catch(TEException exception) {
-        cout << exception.errorMessage();
+        cout << exception.what();
     }
 }
 

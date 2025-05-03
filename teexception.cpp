@@ -21,7 +21,7 @@ TEException::TEException(const ErrorType errorType, const QList<QString> args)
 }
 
 
-QString TEException::errorMessage() const
+QString TEException::what() const
 {
     QString message = "Ошибка ";
 
@@ -79,13 +79,13 @@ QString TEException::errorMessage() const
         message += "количество параметров, указанных в <expression> ({1}) не соответствует указанному количеству параметров, указанных в <paramsCount> ({2}) для функции \"{3}\".";
         break;
     case ErrorType::InputSizeExceeded:
-        message += "текстовое значение \"{1}\" превышает допустимую длину. Текущая длина - {2}, Ожидаемая - {3}."; //НЕТУ
+        message += "текстовое значение \"{1}\" превышает допустимую длину. Текущая длина - {2}, Ожидаемая - {3}.";
         break;
     case ErrorType::UndefinedId:
-        message += "элемент \"{1}\" ни разу не встречается в элементе <expression>.";
+        message += "идентификатор \"{1}\" в значении элемента <expression> не определен";
         break;
     case ErrorType::NeverUsedElement:
-        message += "идентификатор \"{1}\" в значении элемента <expression> не определен";
+        message += "элемент \"{1}\" ни разу не встречается в элементе <expression>.";
         break;
     case ErrorType::InvalidSymbol:
         message += "в значении элемента <expression> обнаружен символ \"{1}\".";
@@ -94,10 +94,10 @@ QString TEException::errorMessage() const
         message += "в значении элемента <expression> превышено допустимое количество операций. Текущее - {1}, ожидается - 20.";
         break;
     case ErrorType::MissingOperand:
-        message += "в значении элемента <expression>, у операнда \"{1}\" отсутствует операция.";
+        message += "в значении элемента <expression>, у операции \"{1}\" отсутствует операнд.";
         break;
     case ErrorType::MissingOperations:
-        message += "в значении элемента <expression>, у операции \"{1}\" отсутствует операнд.";
+        message += "в значении элемента <expression>, у операнда \"{1}\" отсутствует операция.";
         break;
     case ErrorType::MultipleIncrementDecrement:
         message += "в значении элемента <expression>, значение элемента \"{1}\" не может быть инкрементировано или декрементировано более одного раза.";
@@ -115,7 +115,7 @@ QString TEException::errorMessage() const
         message += "количество замен участков в <description> элемента <function> описанием входящих аргументов превышает значение атрибута \"paramsCount\" элемента <function>.";
         break;
     case ErrorType::InvalidParamsCount:
-        message += "значение \"{1}\" атрибута \"paramsCount\" содержит неверное значение. Ожидается: положительное целое число от 0 до 20 включительно."; //НЕТУ
+        message += "значение \"{1}\" атрибута \"paramsCount\" содержит неверное значение. Ожидается: положительное целое число от 0 до 20 включительно.";
         break;
     case ErrorType::MissingCases:
         message += "в элементе <description> отсутствует <case> с атрибутом \"type\" со значением \"{1}\".";
@@ -123,7 +123,6 @@ QString TEException::errorMessage() const
     case ErrorType::UnexpectedCaseType:
         message += "в элементе <case> получено значение атрибута “type” \"{1}\". Ожидается \"{2}\".";
         break;
-
     default:
         message += "unknown error";
         break;

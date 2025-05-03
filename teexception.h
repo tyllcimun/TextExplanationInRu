@@ -61,7 +61,7 @@ public:
     TEException(const ErrorType errorType, const QString &filename, const QList<QString> args = QList<QString>());
     TEException(const ErrorType errorType, const QList<QString> args = QList<QString>());
 
-    QString errorMessage() const;
+    QString what() const;
     ErrorType getErrorType() const;
     int getLine() const;
     QList<QString> getArgs() const;
