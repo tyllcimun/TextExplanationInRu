@@ -468,10 +468,64 @@ void ExpressionXmlParser::validateChildElements(const QDomElement& curElement, c
                 int value = elements.value(childName);
                 if(count > value)
                     throw TEException(ErrorType::DuplicateElement, childElement.lineNumber(), QList<QString>{childName});
+                // Проверка для case-элементов в description
+                if (childName == "description") {
+                    validateCases(childElement);
+                }
+            }
+        }
+        childNode = childNode.nextSibling();
+    }
+}
+
+void ExpressionXmlParser::validateCases(const QDomElement &curDescription)
+{
+    // Список обязательных падежей
+    const QSet<QString> requiredCases = {
+        "именительный", "родительный", "дательный",
+        "винительный", "творительный", "предложный"
+    };
+
+    QDomNodeList caseNodes = curDescription.elementsByTagName("case");
+    if (caseNodes.size() > 0) {
+        QSet<QString> foundCases;
+        QSet<QString> duplicateCases;
+
+        // Собираем все найденные падежи
+        for (int i = 0; i < caseNodes.size(); ++i) {
+            QDomElement caseElem = caseNodes.at(i).toElement();
+            QString caseType = caseElem.attribute("type").trimmed().toLower();
+
+            // Проверяем наличие атрибута "type"
+            if (!caseElem.hasAttribute("type")) {
+                throw TEException(ErrorType::MissingRequiredAttribute, caseElem.lineNumber(),
+                                  {"type"});
+            }
+            // Проверяем на неожиданные значения атрибута "type"
+            if (!requiredCases.contains(caseType)) {
+                throw TEException(ErrorType::UnexpectedAttribute, caseElem.lineNumber(),
+                                  {caseType, requiredCases.values().join(", ")});
+            }
+            // Проверяем на дублирующиеся значения
+            if (foundCases.contains(caseType)) {
+                duplicateCases.insert(caseType);
+            } else {
+                foundCases.insert(caseType);
             }
         }
 
-        childNode = childNode.nextSibling();
+        // Если найдены дубликаты, выбрасываем исключение
+        if (!duplicateCases.isEmpty()) {
+            throw TEException(ErrorType::DuplicateElement, curDescription.lineNumber(),
+                              {QString("case type=\"%1\"").arg(duplicateCases.values().join(", "))});
+        }
+
+        // Проверяем, что все обязательные падежи присутствуют
+        QSet<QString> missingCases = requiredCases - foundCases;
+        if (!missingCases.isEmpty()) {
+            throw TEException(ErrorType::MissingCases, curDescription.lineNumber(),
+                              QList<QString>{missingCases.values().join(", ")});
+        }
     }
 }
 

@@ -82,6 +82,7 @@ private:
     //содержать только цифры от 0 до 9 включительно, все буквы латинского алфавита и спец символ ‘_’ (нижнее подчеркивание).
     static QString parseName(const QDomElement& element);
 
+
     //////////////////////////////////////////////////
     /// Методы для валидации XML элементов и атрибутов
     /////////////////////////////////////////////////
@@ -91,6 +92,7 @@ private:
     static void validateChildElements(const QDomElement& curElement, const QHash<QString, int>& allowedElements);
     static void validateRequiredAttributes(const QDomElement& curElement, const QList<QString>& attributes);
     static void validateRequiredChildElements(const QDomElement& curElement, const QList<QString>& elements);
+    static void validateCases(const QDomElement& curDescription);
     static int countDirectChildren(const QDomElement& element, const QString& childName);
     static bool isLatinLetter(const QChar c);
 
