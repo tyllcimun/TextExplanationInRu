@@ -7,6 +7,23 @@ class ExpressionNode
 {
 public:
     ExpressionNode();
+    ExpressionNode(EntityType nodeType, const QString& value,  ExpressionNode* left = nullptr, ExpressionNode* right = nullptr, const QString& dataType = "", OperationType operType = OperationType::None, QList<ExpressionNode*>* functionArgs = {});
+
+    OperationType getOperType() const;
+    EntityType getNodeType() const;
+    QString getValue() const;
+    QString getDataType() const;
+    QList<ExpressionNode*>* getFunctionArgs() const;
+    ExpressionNode* getRightNode() const;
+    ExpressionNode* getLeftNode() const;
+
+    void setOperType(OperationType newOperType);
+    void setNodeType(EntityType newNodeType);
+    void setValue(QString newValue);
+    void setDataType(QString newDataType);
+    void setFunctionArgs(QList<ExpressionNode*>* newFunctionArgs);
+    void setRightNode(ExpressionNode* newRightNode);
+    void setLeftNode(ExpressionNode* newLeftNode);
 
 private:
     QString value; // содержание ноды

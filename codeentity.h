@@ -19,10 +19,9 @@ enum class EntityType {
     Const,
     Variable,
     Function,
-    Union,
-    Structure,
-    Class,
+    CustomTypeWithFields,
     Enum,
+    Undefined
 };
 
 enum class OperationType {
