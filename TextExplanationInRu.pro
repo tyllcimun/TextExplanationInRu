@@ -11,6 +11,7 @@ SOURCES += \
         codeentity.cpp \
         expression.cpp \
         expressionnode.cpp \
+        expressiontranslator.cpp \
         expressionxmlparser.cpp \
         main.cpp \
         teexception.cpp
@@ -24,5 +25,6 @@ HEADERS += \
     codeentity.h \
     expression.h \
     expressionnode.h \
+    expressiontranslator.h \
     expressionxmlparser.h \
     teexception.h
