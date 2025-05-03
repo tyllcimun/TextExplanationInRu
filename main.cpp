@@ -51,7 +51,8 @@ void printExplanation(QTextStream& cout, const QString& inputFile, const QString
     try {
         // Считать входной файл
         Expression expr = Expression(inputFile);
-        // TODO: Получить объяснение выражения
+        // Получить объяснение выражения
+        cout << expr.getExplanationInRu();
     }
 
     catch(TEException exception) {

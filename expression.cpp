@@ -155,3 +155,14 @@ QString Expression::ToQstring()
 
     return result;
 }
+
+QString Expression::getExplanationInRu()
+{
+    //...Считать что объяснение пустое
+    QString explanation = "";
+    // Преобразовать выражение в дерево
+    // Получить объяснение выражения
+    // Удалить дубликаты слов в полученном выражении
+
+    return explanation;
+}

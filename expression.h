@@ -14,6 +14,8 @@ public:
     Expression(const QString inputXMLFile);
     QString ToQstring();
 
+    QString getExplanationInRu();
+
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
 
