@@ -18,7 +18,6 @@ public:
 
     QString getExplanationInRu();
     ExpressionNode* expressionToNodes();
-    QString removeDuplicates(const QString &str);
     bool isConst(const QString& str);
     bool isVariable(const QString& str);
     bool isFunction(const QString& str);
@@ -28,6 +27,9 @@ public:
     static bool isLatinLetter(const QChar c);
 
     QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType = "") const;
+
+    QString removeDuplicates(const QString &str);
+
 
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
@@ -57,7 +59,10 @@ public:
     const Enum getEnumByName(QString name) const;
 
     const Variable getVariableByNameFromCustomData(QString varName, QString dataName) const;
-    const Function getFunctionByNameFromCustomData(QString varName, QString dataName) const;
+    const Function getFunctionByNameFromCustomData(QString funcName, QString dataName) const;
+    bool isEnumValue(const QString& value, const QString& enumName) const;
+
+    const CustomTypeWithFields getCustomTypeByName(const QString &typeName) const;
 
 private:
     QString expression; // Текстовое выражение

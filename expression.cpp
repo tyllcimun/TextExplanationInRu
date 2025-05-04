@@ -108,6 +108,35 @@ const Enum Expression::getEnumByName(QString name) const
     return getEnums()->value(name);
 }
 
+const Variable Expression::getVariableByNameFromCustomData(QString varName, QString dataName) const
+{
+    // Получить пользовательский тип данных по его имени
+    CustomTypeWithFields customType = getCustomTypeByName(dataName);
+    return customType.variables.value(varName);
+}
+
+const Function Expression::getFunctionByNameFromCustomData(QString funcName, QString dataName) const
+{
+    // Получить пользовательский тип данных по его имени
+    CustomTypeWithFields customType = getCustomTypeByName(dataName);
+    return customType.functions.value(funcName);
+}
+
+const CustomTypeWithFields Expression::getCustomTypeByName(const QString &typeName) const
+{
+    CustomTypeWithFields type;
+    if (classes.contains(typeName)) {
+        type = classes.value(typeName);
+    }
+    else if (structures.contains(typeName)) {
+        type = structures.value(typeName);
+    }
+    else if (unions.contains(typeName)) {
+        type = unions.value(typeName);
+    }
+    return type;
+}
+
 QString Expression::ToQstring()
 {
     QString result = "Expression:   "  + this->expression;
