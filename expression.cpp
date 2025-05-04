@@ -218,6 +218,7 @@ QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const
         //Если у функции есть хотя бы один аргумент, то
         if(node->getFunctionArgs()->count()){
             //##Заполнить описание данными из аргументов функции##.
+            description = ExpressionTranslator::getExplanation(description, argsToDescr(node->getFunctionArgs()));
         }
     }
     //Иначе если тип текущей ноды является переменной, то
@@ -275,4 +276,14 @@ ExpressionNode *Expression::expressionToNodes()
 QString Expression::removeDuplicates(const QString &str)
 {
     return str;
+}
+
+QList<QHash<Case, QString>> Expression::argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType) const
+{
+    QList<QHash<Case, QString>> descriptions;
+    QList<ExpressionNode *>::const_iterator i;
+    for(i = functionArgs->constBegin(); i != functionArgs->constEnd(); i++){
+        descriptions.append(toExplanation(*i));
+    }
+    return descriptions;
 }

@@ -20,6 +20,8 @@ public:
     ExpressionNode* expressionToNodes();
     QString removeDuplicates(const QString &str);
 
+    QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType = "") const;
+
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
 
