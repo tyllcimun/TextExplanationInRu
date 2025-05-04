@@ -122,6 +122,13 @@ const Function Expression::getFunctionByNameFromCustomData(QString funcName, QSt
     return customType.functions.value(funcName);
 }
 
+bool Expression::isEnumValue(const QString &value, const QString &enumName) const
+{
+    bool ok = false;
+    if(getEnumByName(enumName).values.contains(value)) ok = true;
+    return ok;
+}
+
 const CustomTypeWithFields Expression::getCustomTypeByName(const QString &typeName) const
 {
     CustomTypeWithFields type;
