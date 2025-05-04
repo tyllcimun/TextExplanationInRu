@@ -331,5 +331,31 @@ QHash<Case, QString> ExpressionTranslator::getExplanation(const QHash<Case, QStr
 
 QString ExpressionTranslator::replacePlaceholders(const QString &pattern, const QList<QHash<Case, QString> > &args, QRegularExpression &placeholderRegex)
 {
+    QString patternCopy = pattern;
+    QRegularExpressionMatchIterator it = placeholderRegex.globalMatch(pattern);
 
+    // Пока есть вхождения плейсхолдера
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        int index = match.captured(1).toInt() - 1;
+        QString caseStr = match.captured(2);
+
+        if (index >= 0 && index < args.size()) {
+            Case caseEnum = parseCase(caseStr);
+            QString replacement = args[index].value(caseEnum);
+
+            // Заменить плейсхолдер в результирующей строке на соответствующий аргумент в указанном падеже
+            patternCopy.replace(match.captured(0), replacement);
+        }
+    }
+    return patternCopy;
+}
+
+Case ExpressionTranslator::parseCase(const QString &caseChar) {
+    if (caseChar == "и")      return Case::Nominative;      // Именительный
+    else if (caseChar == "р") return Case::Genitive;        // Родительный
+    else if (caseChar == "д") return Case::Dative;          // Дательный
+    else if (caseChar == "в") return Case::Accusative;      // Винительный
+    else if (caseChar == "т") return Case::Instrumental;    // Творительный
+    else if (caseChar == "п") return Case::Prepositional;   // Предложный
 }

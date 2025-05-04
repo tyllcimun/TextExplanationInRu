@@ -18,6 +18,7 @@ public:
     static const QHash<OperationType, QHash<Case, QString>> Templates;
 
     static QHash<Case, QString> getExplanation(const QHash<Case, QString> &description, const QList<QHash<Case, QString>> &arguments);
+    static Case parseCase(const QString &caseChar);
     static QString replacePlaceholders(const QString &pattern, const QList<QHash<Case, QString>> &args, QRegularExpression& placeholderRegex);
 };
 
