@@ -376,6 +376,15 @@ bool Expression::isLatinLetter(const QChar c)
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+OperationType Expression::getOperationTypeByStr(const QString &str)
+{
+    OperationType type = OperationType::None;
+    if(OperationMap.contains(str)){
+        type = OperationMap.value(str).type;
+    }
+    return type;
+}
+
 QString Expression::removeDuplicates(const QString &str)
 {
     return str;

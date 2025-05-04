@@ -28,7 +28,9 @@ public:
 
     QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType = "") const;
 
-    QString removeDuplicates(const QString &str);
+    OperationType getOperationTypeByStr(const QString& str);
+
+    static QString removeDuplicates(const QString &str);
 
 
     void setExpression(const QString &newExpression);
