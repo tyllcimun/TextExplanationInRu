@@ -19,6 +19,13 @@ public:
     QString getExplanationInRu();
     ExpressionNode* expressionToNodes();
     QString removeDuplicates(const QString &str);
+    bool isConst(const QString& str);
+    bool isVariable(const QString& str);
+    bool isFunction(const QString& str);
+    bool isCustomTypeWithFields(const QString& str);
+    bool isEnum(const QString& str);
+    bool isIdentifier(const QString& str);
+    static bool isLatinLetter(const QChar c);
 
     QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType = "") const;
 
