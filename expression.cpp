@@ -331,7 +331,18 @@ bool Expression::isVariable(const QString &str)
     return ok;
 }
 
-
+bool Expression::isFunction(const QString &str)
+{
+    bool ok = false;
+    if(str.contains('(') && str.endsWith(')')){
+        QString identifier = str.left(str.indexOf('('));
+        QString contentInParentheses = str.mid(str.indexOf('(') + 1, str.length() - str.indexOf('(') - 2).trimmed();
+        bool isNumber = false;
+        contentInParentheses.toDouble(&isNumber);
+        if(isIdentifier(identifier) && isNumber) ok = true;
+    }
+    return ok;
+}
 
 bool Expression::isCustomTypeWithFields(const QString &str)
 {
