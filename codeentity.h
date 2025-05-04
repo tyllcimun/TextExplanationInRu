@@ -24,6 +24,11 @@ enum class EntityType {
     Undefined
 };
 
+enum class OperationArity {
+    Unary,
+    Binary
+};
+
 enum class OperationType {
     PrefixIncrement,          // Префиксный инкремент
     PrefixDecrement,          // Префиксный декремент
@@ -58,6 +63,13 @@ enum class OperationType {
     StaticMemberAccess,       // Обращение к статическому элементу
     None
 };
+
+struct OperatorInfo {
+    OperationArity arity;
+    OperationType type;
+};
+
+extern const QHash<QString, OperatorInfo> OperationMap;
 
 // Переменная
 struct Variable {
