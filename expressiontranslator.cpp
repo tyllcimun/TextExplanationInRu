@@ -317,7 +317,16 @@ ExpressionTranslator::ExpressionTranslator() {}
 
 QHash<Case, QString> ExpressionTranslator::getExplanation(const QHash<Case, QString> &description, const QList<QHash<Case, QString> > &arguments)
 {
+    QHash<Case, QString> pattern = {};
+    QRegularExpression placeholderRegex(R"(\{\s*(\d+)\s*\(\s*([а-яА-ЯёЁ])\s*\)\s*\})");
 
+    // Подставить аргументы во все падежи
+    for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
+                   Case::Accusative, Case::Instrumental, Case::Prepositional}) {
+        pattern.insert(c, replacePlaceholders(description[c], arguments, placeholderRegex));
+    }
+
+    return pattern;
 }
 
 QString ExpressionTranslator::replacePlaceholders(const QString &pattern, const QList<QHash<Case, QString> > &args, QRegularExpression &placeholderRegex)
