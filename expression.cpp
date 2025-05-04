@@ -307,6 +307,18 @@ QString Expression::getExplanationInRu()
 ExpressionNode *Expression::expressionToNodes()
 {
 
+
+EntityType Expression::getEntityTypeByStr(const QString &str)
+{
+    //...Считаем, что тип неопределен
+    EntityType type = EntityType::Undefined;
+    if(isConst(str)) type = EntityType::Const;
+    else if(isFunction(str)) type = EntityType::Function;
+    else if(isCustomTypeWithFields(str)) type = EntityType::CustomTypeWithFields;
+    else if(isEnum(str)) type = EntityType::Enum;
+    else if(getOperationTypeByStr(str) != OperationType::None) type = EntityType::Operation;
+    else if(isVariable(str)) type = EntityType::Variable;
+    return type;
 }
 
 bool Expression::isConst(const QString &str)
