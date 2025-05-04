@@ -1,5 +1,6 @@
 #include "expression.h"
 #include "expressionxmlparser.h"
+#include "expressiontranslator.h"
 
 Expression::Expression(const QString inputXMLFile) {
 
@@ -158,7 +159,97 @@ QString Expression::ToQstring()
 
 QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const QString &className, OperationType parentOperType) const
 {
+    //...Считать что описание пустое
     QHash<Case, QString> description = {};
+
+    QHash<Case, QString> descOfRightNode = {};
+    QHash<Case, QString> descOfLeftNode = {};
+
+    //Если тип текущей ноды является операцией, то
+    if(node->getNodeType() == EntityType::Operation) {
+        descOfLeftNode = toExplanation(node->getLeftNode(), "" , node->getOperType()); //##Получить описание первой ноды сиблинга## (Рекурсия)
+
+        //Если тип второй ноды сиблинга является полем, то
+        if(node->getOperType() == OperationType::FieldAccess)
+            descOfRightNode = toExplanation(node->getRightNode(), node->getLeftNode()->getDataType(), node->getOperType()); //##Получить описание второго сиблинга в соответствии с типом первого сиблинга## (Рекурсия)
+        //Если тип второй ноды сиблинга является вариантом перечисления, то
+        else if(node->getOperType() == OperationType::StaticMemberAccess)
+            descOfRightNode = toExplanation(node->getRightNode(), node->getLeftNode()->getValue(), node->getOperType()); //##Получить описание второго сиблинга в соответствии с типом первого сиблинга## (Рекурсия)
+
+        // Иначе если операция бинарная
+        else if(node->getRightNode() != nullptr)
+            descOfRightNode = toExplanation(node->getRightNode(), "", node->getOperType()); //##Получить описание второго сиблинга## (Рекурсия)
+
+        //Если родительская нода является операцией такого же типа что и текущая, то
+        if(parentOperType == node->getOperType()){
+            //считать что описание это перечисление сиблингов через запятую
+            for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
+                           Case::Accusative, Case::Instrumental, Case::Prepositional}) {
+                description[c] = descOfLeftNode[c] + ", " + descOfRightNode[c];
+            }
+        }
+        //Иначе
+        else{
+            //Считать что описание это ##сформированная в соответствии с типом операции и операндами строка##
+            description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
+        }
+    }
+    //Иначе если тип текущей ноды является  константой, то
+    else if(node->getNodeType() == EntityType::Const){
+        //считать что описание это константа
+        for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
+                       Case::Accusative, Case::Instrumental, Case::Prepositional}) {
+            description[c] = node->getValue();
+        }
+    }
+    //Иначе если тип текущей ноды является функцией, то
+    else if(node->getNodeType() == EntityType::Function){
+        //Если поле принадлежит классу, то
+        if(!className.isEmpty()){
+            //Считать что описание это ##полученное описание функции## класса
+            description = this->getFunctionByNameFromCustomData(node->getValue(), className).description;
+        }
+        //Иначе
+        else{
+            //Считать что описание это ##полученное описание функции##.
+            description = this->getFuncByName(node->getValue()).description;
+        }
+
+        //Если у функции есть хотя бы один аргумент, то
+        if(node->getFunctionArgs()->count()){
+            //##Заполнить описание данными из аргументов функции##.
+        }
+    }
+    //Иначе если тип текущей ноды является переменной, то
+    else if(node->getNodeType() == EntityType::Variable){
+        //Если переменная является полем пользовательского типа
+        if(className != ""){
+            if(parentOperType == OperationType::FieldAccess){
+                //считать что описание это ##полученное описание переменной класса##
+                description = this->getVariableByNameFromCustomData(node->getValue(), className).description;
+            }
+            else if(parentOperType == OperationType::StaticMemberAccess){
+                //считать что описание это ##полученное описание варианта перечисления##
+                description = this->getEnumByName(className).values.value(node->getValue());
+            }
+        }
+        //Иначе
+        else{
+            //считать что описание это ##полученное описание переменной##.
+            description = this->getVarByName(node->getValue()).description;
+        }
+    }
+    //Иначе если тип текущей ноды является перечисление, то
+    else if(node->getNodeType() == EntityType::Enum){
+        description = {};
+    }
+
+    //Иначе
+    else{
+        //Вызвать ошибку о несогласованности типов.
+        throw TEException(ErrorType::UnidentifedType, QList<QString>{node->getDataType()});
+    }
+    //Вернуть описание
     return description;
 }
 
