@@ -33,10 +33,7 @@ int main(int argc, char *argv[])
     }
     // Если аргумента три и второй не начинается с "-"
     else if(argc == 3 && !QString(argv[2]).startsWith("-")) {
-        printExpressionInfo(cout, argv[1], argv[2]);
-
-        // Получить объяснение выражения
-        // printExplanation(cout, argv[1], argv[2]);
+        printExplanation(cout, argv[1], argv[2]);
     }
     else {
         cout << ("Ошибка в синтаксисе команды. Подробнее: .\\" + fileName +  " -help");
@@ -45,7 +42,6 @@ int main(int argc, char *argv[])
     a.exit(0);
     return 0;
 }
-
 
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile){
     try {
