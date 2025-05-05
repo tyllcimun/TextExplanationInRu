@@ -455,7 +455,7 @@ bool Expression::isConst(const QString &str)
 bool Expression::isVariable(const QString &str)
 {
     bool ok = false;
-    if(!isIdentifier(str)){
+    if(isIdentifier(str)){
         ok = true;
     }
     else throw TEException(ErrorType::InvalidSymbol, QList<QString>{str});
