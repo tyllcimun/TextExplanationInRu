@@ -193,7 +193,7 @@ QString Expression::ToQstring()
     return result;
 }
 
-QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const QString &className, OperationType parentOperType) const
+QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const QString& className, OperationType parentOperType) const
 {
     //...Считать что описание пустое
     QHash<Case, QString> description = {};
@@ -229,6 +229,7 @@ QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const
             //Считать что описание это ##сформированная в соответствии с типом операции и операндами строка##
             description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
         }
+
     }
     //Иначе если тип текущей ноды является  константой, то
     else if(node->getNodeType() == EntityType::Const){
@@ -238,6 +239,7 @@ QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, const
             description[c] = node->getValue();
         }
     }
+
     //Иначе если тип текущей ноды является функцией, то
     else if(node->getNodeType() == EntityType::Function){
         //Если поле принадлежит классу, то
@@ -300,7 +302,7 @@ QString Expression::getExplanationInRu()
     explanation = this->toExplanation(explanationTree).value(Case::Nominative);
 
     // Удалить дубликаты слов в полученном выражении
-    explanation = removeDuplicates(explanation);
+    explanation = removeConsecutiveDuplicates(explanation);
     return explanation;
 }
 
@@ -527,7 +529,7 @@ OperationType Expression::getOperationTypeByStr(const QString &str)
     return type;
 }
 
-QString Expression::removeDuplicates(const QString &str)
+QString Expression::removeConsecutiveDuplicates(const QString &str)
 {
     return str;
 }

@@ -34,7 +34,7 @@ public:
 
     OperationType getOperationTypeByStr(const QString& str);
 
-    static QString removeDuplicates(const QString &str);
+    static QString removeConsecutiveDuplicates(const QString &str);
 
 
     void setExpression(const QString &newExpression);

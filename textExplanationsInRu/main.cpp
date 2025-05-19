@@ -10,6 +10,7 @@
 
 
 void printHelpMessage(QTextStream& cout, const QString& filename);
+// void printTests(QTextStream& cout);
 void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QString& outputFile);
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile);
 
@@ -21,6 +22,10 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     QTextStream cout(stdout);
     // cout.setEncoding(QStringConverter::Utf8);
+
+#if defined(TESTS)
+    return runTest(argc, argv);
+#endif
 
     QString fileName = QCoreApplication::applicationFilePath();
     QFileInfo fileInfo(fileName);
