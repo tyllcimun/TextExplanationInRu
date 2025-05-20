@@ -29,8 +29,8 @@ public:
         , enums(enms)
     {}
 
+    static Expression fromFile(const QString& path);
 
-    Expression(const QString inputXMLFile);
     QString ToQstring();
     QHash<Case, QString> toExplanation(const ExpressionNode *node, const QString& className = "", OperationType parentOperType = OperationType::None) const;
 
