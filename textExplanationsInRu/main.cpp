@@ -52,18 +52,43 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-
-
-void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile){
-    try {
-        // Считать входной файл
-        Expression expr = Expression(inputFile);
-        // Получить объяснение выражения
-        cout << expr.getExplanationInRu();
+void checkFileAccess(const QString& filePath) {
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        throw TEException(ErrorType::OutputFileCannotBeCreated, QList<QString>{filePath});
     }
+    file.close();
+}
 
-    catch(TEException exception) {
-        cout << exception.what();
+void writeToFile(const QString& filePath, const QString& content) {
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << content;
+        file.close();
+    } else {
+        throw TEException(ErrorType::OutputFileCannotBeCreated, QList<QString>{filePath});
+    }
+}
+
+void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile) {
+    try {
+        // Проверить доступ к выходному файлу
+        checkFileAccess(outputFile);
+        // Считать входной файл
+        Expression exp = Expression::fromFile(inputFile);
+        // Получить объяснение выражения
+        QString explanation = exp.getExplanationInRu();
+        // Вывести объяснение в консоль
+        cout << explanation;
+        // Записать объяснение в выходной файл
+        writeToFile(outputFile, explanation);
+    } catch (QList<TEException>& errors) {
+        for (const TEException& error : errors) {
+            cout << error.what() << "\n";
+        }
+    } catch (TEException& error) {
+        cout << error.what();
     }
 }
 
