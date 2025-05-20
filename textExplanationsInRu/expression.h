@@ -11,6 +11,24 @@
 class Expression
 {
 public:
+    Expression(
+        const QString& expr = "",
+        const QHash<QString, Variable>& vars = {},
+        const QHash<QString, Function>& funcs = {},
+        const QHash<QString, Union>& unns = {},
+        const QHash<QString, Structure>& strucs = {},
+        const QHash<QString, Class>& cls = {},
+        const QHash<QString, Enum>& enms = {}
+        )
+        : expression(expr)
+        , variables(vars)
+        , functions(funcs)
+        , unions(unns)
+        , structures(strucs)
+        , classes(cls)
+        , enums(enms)
+    {}
+
 
     Expression(const QString inputXMLFile);
     QString ToQstring();

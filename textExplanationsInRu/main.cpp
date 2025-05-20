@@ -18,10 +18,10 @@ void printExplanation(QTextStream& cout, const QString& inputFile, const QString
 int main(int argc, char *argv[])
 {
     SetConsoleOutputCP(CP_UTF8);
+    QTextStream cout(stdout);
+    cout.setEncoding(QStringConverter::Utf8);
 
     QCoreApplication a(argc, argv);
-    QTextStream cout(stdout);
-    // cout.setEncoding(QStringConverter::Utf8);
 
 #if defined(TESTS)
     return runTest(argc, argv);
@@ -36,6 +36,10 @@ int main(int argc, char *argv[])
         // Напечатать справочную информацию
         printHelpMessage(cout, fileName);
     }
+    // Если первый аргумент "-test"
+    else if(QString(argv[1]) == "-test") {
+        // Выполнить тесты
+    }
     // Если аргумента три и второй не начинается с "-"
     else if(argc == 3 && !QString(argv[2]).startsWith("-")) {
         printExplanation(cout, argv[1], argv[2]);
@@ -47,6 +51,8 @@ int main(int argc, char *argv[])
     a.exit(0);
     return 0;
 }
+
+
 
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile){
     try {
