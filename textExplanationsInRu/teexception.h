@@ -3,7 +3,7 @@
 
 #include <QList>
 #include <QString>
-
+#include <QHash>
 
 enum class ErrorType {
 
@@ -24,8 +24,8 @@ enum class ErrorType {
     EmptyElementValue,              // Значение элемента не заполнено
     EmptyAttributeName,             // Значение атрибута не заполнено
     ParamsCountFunctionMissmatch,   // Количество параметров в "expression" не соответствует "paramsCount"
-    InputSizeExceeded,              // Превышен допустимый размер входных данных
-
+    InputSizeExceeded,              // Превышен допустимый текстовый размер входных данных
+    InputElementsExceeded,          // Превышено допустимое количество элементов
     // Ошибки формата XML (элемент <expression>)
     UndefinedId,                // Используется переменная, функция или пользовательский тип, которые отсутствуют в соответствующих элементах
     InvalidSymbol,              // В выражении присутствует недопустимый символ
@@ -44,12 +44,15 @@ enum class ErrorType {
 
     // Ошибки формата XML (атрибут "type")
     UnidentifedType,    // В значении атрибута "type" указан неидентифицированный тип данных
+    InvalidType,        // В значении атрибута "type" используются недопустимые символы
 
     // Ошибки формата XML (атрибут "paramsCount")
     InvalidParamsCount, // У атрибута "paramsCount" указан неправильный формат данных
-    // Ошибки формата XML (элемент <description>)
-    MissingCases,       // У описания отсутствует обязательный падеж
-    UnexpectedCaseType     // У элемента case отсутствует ожидаемое значение аттрибута type
+    MissingCases,       // У описания отсутствует обязательный падеж    28
+    MissingReplacementArguments, // Отсутствие аргумента для замены
+    UnexpectedCaseType,     // У элемента case отсутствует ожидаемое значение аттрибута type
+    IncorrectCaseInPlaceHolder, // Неправильно указан падеж в плейсхолдере
+    VariableWithVoidType        // Переменная с типом войд
 };
 
 class TEException
@@ -67,6 +70,7 @@ public:
     QList<QString> getArgs() const;
 
     QString replacePlaceholders(QString pattern, const QList<QString> args) const;
+
 private:
 
     ErrorType errorType; // Тип ошибки
