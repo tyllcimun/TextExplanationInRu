@@ -70,6 +70,7 @@ public:
     QList<QString> getArgs() const;
 
     QString replacePlaceholders(QString pattern, const QList<QString> args) const;
+    static const QHash<ErrorType, QString> ErrorTypeNames;
 
 private:
 

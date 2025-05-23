@@ -20,6 +20,37 @@ TEException::TEException(const ErrorType errorType, const QList<QString> args)
 {
 }
 
+const QHash<ErrorType, QString> TEException::ErrorTypeNames = {
+    {ErrorType::InputFileNotFound, "InputFileNotFound"},
+    {ErrorType::InputCopyFileCannotBeCreated, "InputCopyFileCannotBeCreated"},
+    {ErrorType::OutputFileCannotBeCreated, "OutputFileCannotBeCreated"},
+    {ErrorType::Parsing, "Parsing"},
+    {ErrorType::MissingRootElemnt, "MissingRootElemnt"},
+    {ErrorType::UnexpectedElement, "UnexpectedElement"},
+    {ErrorType::UnexpectedAttribute, "UnexpectedAttribute"},
+    {ErrorType::MissingRequiredChildElement, "MissingRequiredChildElement"},
+    {ErrorType::MissingRequiredAttribute, "MissingRequiredAttribute"},
+    {ErrorType::DuplicateElement, "DuplicateElement"},
+    {ErrorType::DuplicateAttribute, "DuplicateAttribute"},
+    {ErrorType::EmptyElementValue, "EmptyElementValue"},
+    {ErrorType::EmptyAttributeName, "EmptyAttributeName"},
+    {ErrorType::ParamsCountFunctionMissmatch, "ParamsCountFunctionMissmatch"},
+    {ErrorType::InputSizeExceeded, "InputSizeExceeded"},
+    {ErrorType::UndefinedId, "UndefinedId"},
+    {ErrorType::InvalidSymbol, "InvalidSymbol"},
+    {ErrorType::InputDataExprSizeExceeded, "InputDataExprSizeExceeded"},
+    {ErrorType::MissingOperand, "MissingOperand"},
+    {ErrorType::MissingOperations, "MissingOperations"},
+    {ErrorType::MultipleIncrementDecrement, "MultipleIncrementDecrement"},
+    {ErrorType::NeverUsedElement, "NeverUsedElement"},
+    {ErrorType::ParamsCountDescriptionDifference, "ParamsCountDescriptionDifference"},
+    {ErrorType::NonUniqueName, "NonUniqueName"},
+    {ErrorType::InvalidName, "InvalidName"},
+    {ErrorType::UnidentifedType, "UnidentifedType"},
+    {ErrorType::InvalidParamsCount, "InvalidParamsCount"},
+    {ErrorType::MissingCases, "MissingCases"}
+};
+
 QString TEException::what() const {
 
     QString message = "Error: ";
