@@ -1,5 +1,7 @@
 #include "codeentity.h"
 
+const QSet<QString> DataTypes = {"int", "float", "double", "char", "bool", "string"};
+
 const QHash<QString, OperatorInfo> OperationMap = {
     {"++_", {OperationArity::Unary, OperationType::PrefixIncrement}},       // Префиксный инкремент
     {"--_", {OperationArity::Unary, OperationType::PrefixDecrement}},       // Префиксный декремент

@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QHash>
+#include <QSet>
 #include <QString>
 
 enum class Case{
@@ -68,6 +69,8 @@ struct OperatorInfo {
     OperationArity arity;
     OperationType type;
 };
+
+extern const QSet<QString> DataTypes;
 
 extern const QHash<QString, OperatorInfo> OperationMap;
 
