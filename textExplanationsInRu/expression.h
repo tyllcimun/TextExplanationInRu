@@ -30,6 +30,7 @@ public:
     {}
 
     static Expression fromFile(const QString& path);
+    QSet<QString> getCustomDataTypes() const;
 
     QString ToQstring();
     QHash<Case, QString> toExplanation(const ExpressionNode *node, const QString& className = "", OperationType parentOperType = OperationType::None) const;

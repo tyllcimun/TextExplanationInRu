@@ -145,6 +145,27 @@ Expression Expression::fromFile(const QString &path)
     return expr;
 }
 
+QSet<QString> Expression::getCustomDataTypes() const
+{
+    QSet<QString> customDataTypes;
+
+    for (auto it = unions.cbegin(); it != unions.cend(); ++it) {
+        customDataTypes.insert(it.value().name);
+    }
+    for (auto it = structures.cbegin(); it != structures.cend(); ++it) {
+        customDataTypes.insert(it.value().name);
+    }
+    for (auto it = classes.cbegin(); it != classes.cend(); ++it) {
+        customDataTypes.insert(it.value().name);
+    }
+    for (auto it = enums.cbegin(); it != enums.cend(); ++it) {
+        customDataTypes.insert(it.value().name);
+    }
+
+    return customDataTypes;
+}
+
+
 QString Expression::ToQstring()
 {
     QString result = "Expression:   "  + this->expression;
