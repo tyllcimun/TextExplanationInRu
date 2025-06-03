@@ -26,6 +26,10 @@ public:
     void setRightNode(ExpressionNode* newRightNode);
     void setLeftNode(ExpressionNode* newLeftNode);
 
+    bool operator ==(const ExpressionNode& other) const;
+    bool operator !=(const ExpressionNode &other) const;
+
+    bool compareFunctionArgs(const QList<ExpressionNode *> &args1, const QList<ExpressionNode *> &args2) const;
 private:
     QString value; // содержание ноды
     ExpressionNode* right;
@@ -35,6 +39,7 @@ private:
     OperationType operType;
     QString dataType; // тип данных
     QList<ExpressionNode*>* FunctionArgs; // аргументы функции
+
 };
 
 #endif // EXPRESSIONNODE_H
