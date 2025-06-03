@@ -8,6 +8,7 @@ class ExpressionNode
 public:
     ExpressionNode();
     ExpressionNode(EntityType nodeType, const QString& value,  ExpressionNode* left = nullptr, ExpressionNode* right = nullptr, const QString& dataType = "", OperationType operType = OperationType::None, QList<ExpressionNode*>* functionArgs = {});
+    QString toString() const;
 
     OperationType getOperType() const;
     EntityType getNodeType() const;

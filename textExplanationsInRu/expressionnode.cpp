@@ -19,6 +19,39 @@ ExpressionNode::ExpressionNode(EntityType nodeType, const QString &value, Expres
     dataType(dataType),
     FunctionArgs(functionArgs) {}
 
+QString ExpressionNode::toString() const {
+    QString result;
+
+    // Добавляем информацию об узле
+    result += value.isEmpty() ? "Unknown" : value;
+
+    // Если это функция, добавляем аргументы
+    if (nodeType == EntityType::Function && FunctionArgs) {
+        result += "(";
+        QStringList args;
+        for (auto* arg : *FunctionArgs) {
+            args << arg->toString(); // Рекурсивно вызываем для аргументов
+        }
+        result += args.join(", "); // Соединяем аргументы через запятую
+        result += ")";
+    }
+
+    // Обрабатываем левый и правый узлы
+    if (left || right) {
+        result += " (";
+        if (left) {
+            result += left->toString();
+        }
+        result += "; ";
+        if (right) {
+            result += right->toString();
+        }
+        result += ")";
+    }
+
+    return result;
+}
+
 OperationType ExpressionNode::getOperType() const {
     return operType;
 }
