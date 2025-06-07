@@ -451,6 +451,46 @@ ExpressionNode *Expression::expressionToNodes()
     return nodeStack.pop();
 }
 
+void Expression::getCustomTypeFields(QSet<QString>& names, const CustomTypeWithFields& customType) {
+    names.insert(customType.name);
+    for (auto i = customType.variables.cbegin(); i != customType.variables.cend(); i++) {
+        names.insert(customType.name + "." + i.value().name);
+    }
+    for (auto i = customType.functions.cbegin(); i != customType.functions.cend(); i++) {
+        names.insert(customType.name + "." + i.value().name);
+    }
+}
+
+
+QSet<QString> Expression::getAllNames() {
+    QSet<QString> names;
+    // переменные
+    for (auto i = variables.cbegin(); i != variables.cend(); i++) {
+        names.insert(i.value().name);
+    }
+    // функции
+    for (auto i = functions.cbegin(); i != functions.cend(); i++) {
+        names.insert(i.value().name);
+    }
+    for (auto i = unions.cbegin(); i != unions.cend(); i++) {
+        getCustomTypeFields(names, i.value());
+    }
+    for (auto i = structures.cbegin(); i != structures.cend(); i++) {
+        getCustomTypeFields(names, i.value());
+    }
+    for (auto i = classes.cbegin(); i != classes.cend(); i++) {
+        getCustomTypeFields(names, i.value());
+    }
+    // перечисления
+    for (auto i = enums.cbegin(); i != enums.cend(); i++) {
+        names.insert(i.value().name);
+        for (auto enumI = i.value().values.cbegin(); enumI != i.value().values.cend(); enumI++) {
+            names.insert(i.value().name + "." + enumI.key());
+        }
+    }
+    return names;
+}
+
 EntityType Expression::getEntityTypeByStr(const QString &str)
 {
     //...Считаем, что тип неопределен

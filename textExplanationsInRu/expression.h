@@ -35,9 +35,11 @@ public:
     QString ToQstring();
     QHash<Case, QString> toExplanation(const ExpressionNode *node, const QString& className = "", OperationType parentOperType = OperationType::None) const;
 
+
     QString getExplanationInRu();
     ExpressionNode* expressionToNodes();
 
+    QSet<QString> getAllNames();
     EntityType getEntityTypeByStr(const QString& str);
     bool isConst(const QString& str);
     bool isVariable(const QString& str);
@@ -54,7 +56,6 @@ public:
     OperationType getOperationTypeByStr(const QString& str);
 
     static QString removeConsecutiveDuplicates(const QString &str);
-
 
     void setExpression(const QString &newExpression);
     const QString* getExpression() const;
@@ -89,6 +90,7 @@ public:
 
     const CustomTypeWithFields getCustomTypeByName(const QString &typeName) const;
 
+    void getCustomTypeFields(QSet<QString> &names, const CustomTypeWithFields &customType);
 private:
     QString expression; // Текстовое выражение
     QHash<QString, Variable> variables; //  Переменные
