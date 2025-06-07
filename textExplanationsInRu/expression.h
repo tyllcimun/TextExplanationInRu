@@ -91,6 +91,7 @@ public:
     const CustomTypeWithFields getCustomTypeByName(const QString &typeName) const;
 
     void getCustomTypeFields(QSet<QString> &names, const CustomTypeWithFields &customType);
+    static QStringList splitExpression(const QString &str);
 private:
     QString expression; // Текстовое выражение
     QHash<QString, Variable> variables; //  Переменные

@@ -328,8 +328,41 @@ QString Expression::getExplanationInRu()
     return explanation;
 }
 
-ExpressionNode *Expression::expressionToNodes()
-{
+QStringList Expression::splitExpression(const QString &str) {
+    QStringList tokens;
+    QString currentToken;
+    bool insideQuotes = false;
+
+    for (int i = 0; i < str.size(); ++i) {
+        QChar currentChar = str[i];
+        // Если обнаружили кавычку, переключаем режим обработки
+        if (currentChar == '"') {
+            insideQuotes = !insideQuotes;
+            currentToken += currentChar;
+        }
+        // Если находимся внутри кавычек, добавляем символ в текущий токен
+        else if (insideQuotes) {
+            currentToken += currentChar;
+        }
+        // Если пробел и не внутри кавычек, завершаем текущий токен
+        else if (currentChar.isSpace()) {
+            if (!currentToken.isEmpty()) {
+                tokens.append(currentToken);
+                currentToken.clear();
+            }
+        }
+        // Иначе добавляем символ в текущий токен
+        else {
+            currentToken += currentChar;
+        }
+    }
+    // Добавляем последний токен, если он не пустой
+    if (!currentToken.isEmpty()) {
+        tokens.append(currentToken);
+    }
+    return tokens;
+}
+
     // Разделяем выражение на лексемы
     QStringList tokens = expression.split(' ', Qt::SkipEmptyParts);
     //...Считаем, что стек узлов пустой
