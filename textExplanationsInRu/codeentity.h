@@ -46,6 +46,7 @@ enum class OperationType {
     Division,                 // Деление
     Modulus,                  // Остаток от деления
     Addition,                 // Сложение
+    Concatenation,            // Конкатенация
     Subtraction,              // Вычитание
     LessThan,                 // Оператор сравнения «меньше»
     GreaterThan,              // Оператор сравнения «больше»
@@ -62,6 +63,16 @@ enum class OperationType {
     PostfixDecrement,         // Постфиксный декремент
     PostfixIncrement,         // Постфиксный инкремент
     StaticMemberAccess,       // Обращение к статическому элементу
+    NotLessThan,              // Логическое "не меньше"
+    NotLessThanOrEqual,       // Логическое "не меньше или равно"
+    NotGreaterThan,           // Логическое "не больше"
+    NotGreaterThanOrEqual,    // Логическое "не больше или равно"
+    PointerIndexAccess,       // Получение элементу по индексу указателя
+    SubtractionSequence,      // Операции вычитания подряд
+    DivisionSequence,         // Операции деления подряд
+    SingleIncrement,          // Один инкремент
+    SingleDecrement,          // Один декремент
+    FunctionCall,
     None
 };
 

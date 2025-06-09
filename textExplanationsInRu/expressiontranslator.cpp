@@ -1,4 +1,5 @@
 #include "expressiontranslator.h"
+#include "teexception.h"
 
 const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates = {
     {
@@ -9,6 +10,16 @@ const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates
             {Case::Accusative, "сумму {1 (р)} и {2 (р)}"},
             {Case::Instrumental, "суммой {1 (р)} и {2 (р)}"},
             {Case::Prepositional, "сумме {1 (р)} и {2 (р)}"}
+        }
+    },
+    {
+        OperationType::Concatenation, {
+            {Case::Nominative, "конкатенация {1 (р)} и {2 (р)}"},
+            {Case::Genitive, "конкатенации {1 (р)} и {2 (р)}"},
+            {Case::Dative, "конкатенации {1 (р)} и {2 (р)}"},
+            {Case::Accusative, "конкатенацию {1 (р)} и {2 (р)}"},
+            {Case::Instrumental, "конкатенацией {1 (р)} и {2 (р)}"},
+            {Case::Prepositional, "конкатенации {1 (р)} и {2 (р)}"}
         }
     },
     {
@@ -123,12 +134,12 @@ const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates
     },
     {
         OperationType::Modulus, {
-            {Case::Nominative, "остаток от деления {1 (р)} на {2 (р)}"},
-            {Case::Genitive, "остатка от деления {1 (р)} на {2 (р)}"},
-            {Case::Dative, "остатку от деления {1 (р)} на {2 (р)}"},
-            {Case::Accusative, "остаток от деления {1 (р)} на {2 (р)}"},
-            {Case::Instrumental, "остатком от деления {1 (р)} на {2 (р)}"},
-            {Case::Prepositional, "остатке от деления {1 (р)} на {2 (р)}"}
+            {Case::Nominative, "остаток от деления {1 (р)} на {2 (и)}"},
+            {Case::Genitive, "остатка от деления {1 (р)} на {2 (и)}"},
+            {Case::Dative, "остатку от деления {1 (р)} на {2 (и)}"},
+            {Case::Accusative, "остаток от деления {1 (р)} на {2 (и)}"},
+            {Case::Instrumental, "остатком от деления {1 (р)} на {2 (и)}"},
+            {Case::Prepositional, "остатке от деления {1 (р)} на {2 (и)}"}
         }
     },
     {
@@ -163,12 +174,12 @@ const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates
     },
     {
         OperationType::Dereference, {
-            {Case::Nominative, "{1 (и)}"},
-            {Case::Genitive, "{1 (р)}"},
-            {Case::Dative, "{1 (д)}"},
-            {Case::Accusative, "{1 (в)}"},
-            {Case::Instrumental, "{1 (т)}"},
-            {Case::Prepositional, "{1 (п)}"}
+            {Case::Nominative, "обращение к значению по адресу {1 (р)}"},
+            {Case::Genitive, "обращения к значению по адресу {1 (р)}"},
+            {Case::Dative, "обращению к значению по адресу {1 (р)}"},
+            {Case::Accusative, "обращение к значению по адресу {1 (р)}"},
+            {Case::Instrumental, "обращением к значению по адресу {1 (р)}"},
+            {Case::Prepositional, "обращении к значению по адресу {1 (р)}"}
         }
     },
     {
@@ -213,42 +224,42 @@ const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates
     },
     {
         OperationType::PrefixIncrement, {
-            {Case::Nominative, "инкрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Genitive, "инкрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Dative, "инкрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Accusative, "инкрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Instrumental, "инкрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Prepositional, "инкрементировать {1 (и)}, а затем {2 (в)}"}
+            {Case::Nominative, "инкрементировать {1 (в)}, а затем получить {2 (в)}"},
+            {Case::Genitive, "инкрементирования {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Dative, "инкрементированию {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Accusative, "инкрементирование {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Instrumental, "инкрементированием {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Prepositional, "инкрементировании {1 (р)}, а затем получить {2 (в)}"}
         }
     },
     {
         OperationType::PostfixIncrement, {
-            {Case::Nominative, "получить {2 (в)}, а затем инкрементировать {1 (и)}"},
-            {Case::Genitive, "получить {2 (в)}, а затем инкрементировать {1 (и)}"},
-            {Case::Dative, "получить {2 (в)}, а затем инкрементировать {1 (и)}"},
-            {Case::Accusative, "получить {2 (в)}, а затем инкрементировать {1 (и)}"},
-            {Case::Instrumental, "получить {2 (в)}, а затем инкрементировать {1 (и)}"},
-            {Case::Prepositional, "получить {2 (в)}, а затем инкрементировать {1 (и)}"}
+            {Case::Nominative, "получить {2 (в)}, а затем инкрементировать {1 (в)}"},
+            {Case::Genitive, "получения {2 (р)}, а затем инкрементировать {1 (в)}"},
+            {Case::Dative, "получению {2 (р)}, а затем инкрементировать {1 (в)}"},
+            {Case::Accusative, "получение {2 (р)}, а затем инкрементировать {1 (в)}"},
+            {Case::Instrumental, "получением {2 (р)}, а затем инкрементировать {1 (в)}"},
+            {Case::Prepositional, "получении {2 (р)}, а затем инкрементировать {1 (в)}"}
         }
     },
     {
         OperationType::PrefixDecrement, {
-            {Case::Nominative, "декрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Genitive, "декрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Dative, "декрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Accusative, "декрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Instrumental, "декрементировать {1 (и)}, а затем {2 (в)}"},
-            {Case::Prepositional, "декрементировать {1 (и)}, а затем {2 (в)}"}
+            {Case::Nominative, "декрементировать {1 (в)}, а затем получить {2 (в)}"},
+            {Case::Genitive, "декрементирования {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Dative, "декрементированию {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Accusative, "декрементирование {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Instrumental, "декрементированием {1 (р)}, а затем получить {2 (в)}"},
+            {Case::Prepositional, "декрементировании {1 (р)}, а затем получить {2 (в)}"}
         }
     },
     {
         OperationType::PostfixDecrement, {
-            {Case::Nominative, "получить {2 (в)}, а затем декрементировать {1 (и)}"},
-            {Case::Genitive, "получить {2 (в)}, а затем декрементировать {1 (и)}"},
-            {Case::Dative, "получить {2 (в)}, а затем декрементировать {1 (и)}"},
-            {Case::Accusative, "получить {2 (в)}, а затем декрементировать {1 (и)}"},
-            {Case::Instrumental, "получить {2 (в)}, а затем декрементировать {1 (и)}"},
-            {Case::Prepositional, "получить {2 (в)}, а затем декрементировать {1 (и)}"}
+            {Case::Nominative, "получить {2 (в)}, а затем декрементировать {1 (в)}"},
+            {Case::Genitive, "получения {2 (р)}, а затем декрементировать {1 (в)}"},
+            {Case::Dative, "получению {2 (р)}, а затем декрементировать {1 (в)}"},
+            {Case::Accusative, "получение {2 (р)}, а затем декрементировать {1 (в)}"},
+            {Case::Instrumental, "получением {2 (р)}, а затем декрементировать {1 (в)}"},
+            {Case::Prepositional, "получении {2 (р)}, а затем декрементировать {1 (в)}"}
         }
     },
     {
@@ -310,7 +321,98 @@ const QHash<OperationType, QHash<Case, QString>> ExpressionTranslator::Templates
             {Case::Instrumental, "присваиванием {1 (д)} остатка от деления {1 (р)} и {2 (р)}"},
             {Case::Prepositional, "присваивании {1 (д)} остатка от деления {1 (р)} и {2 (р)}"}
         }
-    }
+    },
+    {
+        OperationType::NotLessThan, {
+            {Case::Nominative, "{1 (и)} не меньше {2 (р)}"},
+            {Case::Genitive, "{1 (р)} не меньше {2 (р)}"},
+            {Case::Dative, "{1 (д)} не меньше {2 (р)}"},
+            {Case::Accusative, "{1 (в)} не меньше {2 (р)}"},
+            {Case::Instrumental, "{1 (т)} не меньше {2 (р)}"},
+            {Case::Prepositional, "{1 (п)} не меньше {2 (р)}"}
+        }
+    },
+    {
+        OperationType::NotLessThanOrEqual, {
+            {Case::Nominative, "{1 (и)} не меньше или равно {2 (р)}"},
+            {Case::Genitive, "{1 (р)} не меньше или равно {2 (р)}"},
+            {Case::Dative, "{1 (д)} не меньше или равно {2 (р)}"},
+            {Case::Accusative, "{1 (в)} не меньше или равно {2 (р)}"},
+            {Case::Instrumental, "{1 (т)} не меньше или равно {2 (р)}"},
+            {Case::Prepositional, "{1 (п)} не меньше или равно {2 (р)}"}
+        }
+    },
+    {
+        OperationType::NotGreaterThan, {
+            {Case::Nominative, "{1 (и)} не больше {2 (р)}"},
+            {Case::Genitive, "{1 (р)} не больше {2 (р)}"},
+            {Case::Dative, "{1 (д)} не больше {2 (р)}"},
+            {Case::Accusative, "{1 (в)} не больше {2 (р)}"},
+            {Case::Instrumental, "{1 (т)} не больше {2 (р)}"},
+            {Case::Prepositional, "{1 (п)} не больше {2 (р)}"}
+        }
+    },
+    {
+        OperationType::NotGreaterThanOrEqual, {
+            {Case::Nominative, "{1 (и)} не больше или равно {2 (р)}"},
+            {Case::Genitive, "{1 (р)} не больше или равно {2 (р)}"},
+            {Case::Dative, "{1 (д)} не больше или равно {2 (р)}"},
+            {Case::Accusative, "{1 (в)} не больше или равно {2 (р)}"},
+            {Case::Instrumental, "{1 (т)} не больше или равно {2 (р)}"},
+            {Case::Prepositional, "{1 (п)} не больше или равно {2 (р)}"}
+        }
+    },
+    {
+        OperationType::PointerIndexAccess, {
+            {Case::Nominative, "получение элемента по индексу, равному указателю {1 (р)}"},
+            {Case::Genitive, "получения элемента по индексу, равному указателю {1 (р)}"},
+            {Case::Dative, "получению элемента по индексу, равному указателю {1 (р)}"},
+            {Case::Accusative, "получение элемента по индексу, равному указателю {1 (р)}"},
+            {Case::Instrumental, "получением элемента по индексу, равному указателю {1 (р)}"},
+            {Case::Prepositional, "получении элемента по индексу, равному указателю {1 (р)}"}
+        }
+    },
+    {
+        OperationType::SubtractionSequence, {
+            {Case::Nominative, "разность {1 (р)} и суммы {2 (р)}"},
+            {Case::Genitive, "разности {1 (р)} и суммы {2 (р)}"},
+            {Case::Dative, "разности {1 (р)} и суммы {2 (р)}"},
+            {Case::Accusative, "разность {1 (р)} и суммы {2 (р)}"},
+            {Case::Instrumental, "разностью {1 (р)} и суммы {2 (р)}"},
+            {Case::Prepositional, "разности {1 (р)} и суммы {2 (р)}"}
+        }
+    },
+    {
+        OperationType::DivisionSequence, {
+            {Case::Nominative, "частное {1 (р)} и произведения {2 (р)}"},
+            {Case::Genitive, "частного {1 (р)} и произведения {2 (р)}"},
+            {Case::Dative, "частному {1 (р)} и произведения {2 (р)}"},
+            {Case::Accusative, "частное {1 (р)} и произведения {2 (р)}"},
+            {Case::Instrumental, "частным {1 (р)} и произведения {2 (р)}"},
+            {Case::Prepositional, "частном {1 (р)} и произведения {2 (р)}"}
+        }
+    },
+    {
+        OperationType::SingleIncrement, {
+            {Case::Nominative, "инкрементировать {1 (в)}"},
+            {Case::Genitive, "инкрементирования {1 (р)}"},
+            {Case::Dative, "инкрементированию {1 (р)}"},
+            {Case::Accusative, "инкрементирование {1 (р)}"},
+            {Case::Instrumental, "инкрементированием {1 (р)}"},
+            {Case::Prepositional, "инкрементировании {1 (р)}"}
+        }
+    },
+    {
+        OperationType::SingleDecrement, {
+            {Case::Nominative, "декрементировать {1 (в)}"},
+            {Case::Genitive, "декрементирования {1 (р)}"},
+            {Case::Dative, "декрементированию {1 (р)}"},
+            {Case::Accusative, "декрементирование {1 (р)}"},
+            {Case::Instrumental, "декрементированием {1 (р)}"},
+            {Case::Prepositional, "декрементировании {1 (р)}"}
+        }
+    },
+
 };
 
 ExpressionTranslator::ExpressionTranslator() {}
