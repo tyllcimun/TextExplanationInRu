@@ -22,7 +22,7 @@ void Expression::setVariables(const QHash<QString, Variable> &newVariables)
     variables = newVariables;
 }
 
-const Variable Expression::getVarByName(QString name) const
+const Variable Expression::getVarByName(const QString & name) const
 {
     return getVariables()->value(name);
 }
@@ -37,7 +37,7 @@ void Expression::setFunctions(const QHash<QString, Function> &newFunctions)
     functions = newFunctions;
 }
 
-const Function Expression::getFuncByName(QString name) const
+const Function Expression::getFuncByName(const QString & name) const
 {
     return getFunctions()->value(name);
 }
@@ -52,7 +52,7 @@ void Expression::setUnions(const QHash<QString, Union> &newUnions)
     unions = newUnions;
 }
 
-const Union Expression::getUnionByName(QString name) const
+const Union Expression::getUnionByName(const QString & name) const
 {
     return getUnions()->value(name);
 }
@@ -67,7 +67,7 @@ void Expression::setStructures(const QHash<QString, Structure> &newStructures)
     structures = newStructures;
 }
 
-const Structure Expression::getStructByName(QString name) const
+const Structure Expression::getStructByName(const QString & name) const
 {
     return getStructures()->value(name);
 }
@@ -82,7 +82,7 @@ void Expression::setClasses(const QHash<QString, Class> &newClasses)
     classes = newClasses;
 }
 
-const Class Expression::getClassByName(QString name) const
+const Class Expression::getClassByName(const QString & name) const
 {
     return getClasses()->value(name);
 }
@@ -97,7 +97,7 @@ void Expression::setEnums(const QHash<QString, Enum> &newEnums)
     enums = newEnums;
 }
 
-const Enum Expression::getEnumByName(QString name) const
+const Enum Expression::getEnumByName(const QString & name) const
 {
     return getEnums()->value(name);
 }
