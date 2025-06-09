@@ -441,7 +441,7 @@ QString ExpressionTranslator::replacePlaceholders(const QString &pattern, const 
         QRegularExpressionMatch match = it.next();
         int index = match.captured(1).toInt() - 1;
         QString caseStr = match.captured(2);
-
+        // Если индекс в плейсхолдере корректный
         if (index >= 0 && index < args.size()) {
             Case caseEnum = parseCase(caseStr);
             QString replacement = args[index].value(caseEnum);
@@ -449,6 +449,8 @@ QString ExpressionTranslator::replacePlaceholders(const QString &pattern, const 
             // Заменить плейсхолдер в результирующей строке на соответствующий аргумент в указанном падеже
             patternCopy.replace(match.captured(0), replacement);
         }
+        // Иначе вызвать ошибку
+        else throw TEException(ErrorType::MissingReplacementArguments, QList<QString>{pattern});
     }
     return patternCopy;
 }
@@ -460,4 +462,5 @@ Case ExpressionTranslator::parseCase(const QString &caseChar) {
     else if (caseChar == "в") return Case::Accusative;      // Винительный
     else if (caseChar == "т") return Case::Instrumental;    // Творительный
     else if (caseChar == "п") return Case::Prepositional;   // Предложный
+    else throw TEException(ErrorType::IncorrectCaseInPlaceHolder, QList<QString>{caseChar});
 }
