@@ -624,8 +624,9 @@ bool Expression::isConst(const QString &str)
 {
     //...Считаем что строка не является константой
     bool ok = false;
-    // Если строку можно перевести в число, то
-    if(str.toInt() || str.toFloat() || str.toDouble()){
+    // Если строку можно перевести в число или строка константа типа bool то
+    if(str.toInt() || str.toFloat() || str.toDouble() || str == "true" || str == "false" ||
+        (str.startsWith("\"") && str.endsWith("\""))){
         // строка является константой
         ok = true;
     }
