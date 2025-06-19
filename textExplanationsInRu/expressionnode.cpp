@@ -1,5 +1,6 @@
 #include "expressionnode.h"
 
+// Конструктор по умолчанию
 ExpressionNode::ExpressionNode()
     : value(""),
     right(nullptr),
@@ -50,6 +51,47 @@ QString ExpressionNode::toString() const {
     }
 
     return result;
+}
+
+bool ExpressionNode::isReducibleUnarySelfInverse() const
+{
+    if(this->getLeftNode() != nullptr && this->getRightNode() == nullptr){
+        if((this->getOperType() == this->getLeftNode()->getOperType() && (this->getOperType() == OperationType::UnaryMinus ||this->getOperType() == OperationType::Not)) ||
+            (this->getOperType() == OperationType::Dereference && this->getLeftNode()->getOperType() == OperationType::AddressOf) ||
+            (this->getOperType() == OperationType::AddressOf && this->getLeftNode()->getOperType() == OperationType::Dereference))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ExpressionNode::isComparisonOperation() const {
+    if (this != nullptr && this->getNodeType() == EntityType::Operation) {
+        OperationType operType = this->getOperType();
+        return operType == OperationType::LessThan ||
+               operType == OperationType::LessThanOrEqual ||
+               operType == OperationType::GreaterThan ||
+               operType == OperationType::GreaterThanOrEqual ||
+               operType == OperationType::Equal ||
+               operType == OperationType::NotEqual ||
+               operType == OperationType::NotLessThan ||
+               operType == OperationType::NotLessThanOrEqual ||
+               operType == OperationType::NotGreaterThan ||
+               operType == OperationType::NotGreaterThanOrEqual;
+    }
+    return false;
+}
+
+bool ExpressionNode::isIncrementOrDecrement() const {
+    if (this != nullptr && this->getNodeType() == EntityType::Operation) {
+        OperationType operType = this->getOperType();
+        return operType == OperationType::PostfixIncrement ||
+               operType == OperationType::PrefixIncrement ||
+               operType == OperationType::PostfixDecrement ||
+               operType == OperationType::PrefixDecrement;
+    }
+    return false;
 }
 
 OperationType ExpressionNode::getOperType() const {
