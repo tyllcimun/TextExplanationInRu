@@ -83,6 +83,8 @@ struct OperatorInfo {
 
 extern const QSet<QString> DataTypes;
 
+extern const QHash<OperationType, OperationType> InverseComparisonOperationsMap;
+
 extern const QHash<QString, OperatorInfo> OperationMap;
 
 // Переменная

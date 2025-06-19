@@ -2,6 +2,19 @@
 
 const QSet<QString> DataTypes = {"int", "float", "double", "char", "bool", "string"};
 
+const QHash<OperationType, OperationType> InverseComparisonOperationsMap = {
+    {OperationType::LessThan, OperationType::NotLessThan},
+    {OperationType::LessThanOrEqual, OperationType::NotLessThanOrEqual},
+    {OperationType::GreaterThan, OperationType::NotGreaterThan},
+    {OperationType::GreaterThanOrEqual, OperationType::NotGreaterThanOrEqual},
+    {OperationType::Equal, OperationType::NotEqual},
+    {OperationType::NotEqual, OperationType::Equal},
+    {OperationType::NotLessThan, OperationType::LessThan},
+    {OperationType::NotLessThanOrEqual, OperationType::LessThanOrEqual},
+    {OperationType::NotGreaterThan, OperationType::GreaterThan},
+    {OperationType::NotGreaterThanOrEqual, OperationType::GreaterThanOrEqual}
+};
+
 const QHash<QString, OperatorInfo> OperationMap = {
     {"++_", {OperationArity::Unary, OperationType::PrefixIncrement}},       // Префиксный инкремент
     {"--_", {OperationArity::Unary, OperationType::PrefixDecrement}},       // Префиксный декремент
