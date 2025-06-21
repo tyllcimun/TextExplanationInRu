@@ -33,7 +33,7 @@ public:
     QSet<QString> getCustomDataTypes() const;
 
     QString ToQstring();
-    QHash<Case, QString> toExplanation(const ExpressionNode *node, const QString& className = "", OperationType parentOperType = OperationType::None) const;
+    QHash<Case, QString> toExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString& className = "", OperationType parentOperType = OperationType::None) const;
 
 
     QString getExplanationInRu();
@@ -51,7 +51,7 @@ public:
 
     static bool isLatinLetter(const QChar c);
 
-    QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QString customDataType = "") const;
+    QList<QHash<Case, QString>> argsToDescr(const QList<ExpressionNode *> *functionArgs, QHash<Case, QString> &intermediateDescription, QString customDataType = "", OperationType parentOperType = OperationType::None) const;
 
     OperationType getOperationTypeByStr(const QString& str);
 

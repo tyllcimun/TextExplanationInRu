@@ -26,7 +26,8 @@ void test_toExplanation::toExplanation()
     QFETCH(CaseExplanationHash, expectedExplanation);
 
     try {
-        QHash<Case, QString> result = expression.toExplanation(node, className, parentOperType);
+        QHash<Case, QString> empty = {};
+        QHash<Case, QString> result = expression.toExplanation(node, empty, className, parentOperType);
         qDebug() << "Actual Explanation: " << result[Case::Nominative];
         qDebug() << "Expected Explanation: " << expectedExplanation[Case::Nominative];
 
