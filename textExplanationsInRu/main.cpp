@@ -1,3 +1,23 @@
+/*!
+* \file
+* \brief Данный файл содержит главную функцию программы textExplanationsInRu.
+*
+* \mainpage Документация для программы "text explanations in Russian language (textExplanationsInRu)"
+Программа предназначена для генерации текстового объяснения выражения на русском языке. Она принимает на вход XML-файл с описанием выражения и генерирует соответствующее объяснение в виде текстового файла.
+\n\nДля функционирования программы необходима операционная система Windows 7 или выше.
+\nТребуемые библиотеки: Qt6Core.dll, Qt6Xml.dll, libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll
+\nПрограмма должна получать два аргумента командной строки: имя входного файла и имя выходного файла в формате 'txt'
+
+\nПример команды запуска программы:
+* \code
+.\textExplanationsInRu.exe input.txt output.txt
+* \endcode
+
+* \author Popova Anna
+* \date June 2025
+* \version 1.0
+*/
+
 #include "expression.h"
 #include "teexception.h"
 
@@ -8,11 +28,35 @@
 #include <QTextStream>
 
 
-
+/*!
+ * \brief Выводит справочное сообщение в поток
+ * \param[out] cout Поток вывода (например, QTextStream(stdout))
+ * \param[in] filename Имя исполняемого файла, подставляется в шаблон использования
+ */
 void printHelpMessage(QTextStream& cout, const QString& filename);
-// void printTests(QTextStream& cout);
-void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QString& outputFile);
+
+/*!
+ * \brief Печатает пояснение выражения, считанного из XML-файла
+ * \param[out] cout Поток, в который выводится пояснение
+ * \param[in] inputFile Путь к входному XML-файлу с выражением
+ * \param[in] outputFile Путь к выходному файлу (если необходимо сохранить результат)
+ */
 void printExplanation(QTextStream& cout, const QString& inputFile, const QString& outputFile);
+
+/*!
+ * \brief Проверяет доступность файла для записи
+ * \param[in] filePath Путь к файлу, который нужно проверить
+ * \throws TEException Если файл не может быть создан или открыт для записи
+ */
+void checkFileAccess(const QString& filePath);
+
+/*!
+ * \brief Записывает текст в указанный файл
+ * \param[in] filePath Путь к файлу, в который нужно записать содержимое
+ * \param[in] content Содержимое, которое будет записано в файл
+ * \throws TEException Если файл не может быть открыт для записи
+ */
+void writeToFile(const QString& filePath, const QString& content);
 
 
 int main(int argc, char *argv[])
@@ -89,17 +133,6 @@ void printExplanation(QTextStream& cout, const QString& inputFile, const QString
         }
     } catch (TEException& error) {
         cout << error.what();
-    }
-}
-
-void printExpressionInfo(QTextStream& cout, const QString& inputFile, const QString& outputFile){
-
-    try {
-        Expression expr = Expression(inputFile);
-        cout << expr.ToQstring();
-    }
-    catch(TEException exception) {
-        cout << exception.what();
     }
 }
 

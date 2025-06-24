@@ -1,3 +1,8 @@
+/*!
+ * \file
+ * \brief Заголовочный файл, содержащий описание класса TEException и перечисления ErrorType для обработки ошибок при парсинге XML.
+ */
+
 #ifndef TEEXCEPTION_H
 #define TEEXCEPTION_H
 
@@ -5,79 +10,141 @@
 #include <QString>
 #include <QHash>
 
+/*!
+ * \brief Перечисление типов ошибок, возникающих при обработке XML и файлов.
+ */
 enum class ErrorType {
-
     // Ошибки файлов
-    InputFileNotFound,               // Указанный входной файл не существует или нет доступа
-    InputCopyFileCannotBeCreated,   // Невозможно создать копию входного файла
-    OutputFileCannotBeCreated,      // Невозможно создать указанный выходной файл
+    InputFileNotFound,               /*!< Входной файл не найден или недоступен */
+    InputCopyFileCannotBeCreated,   /*!< Невозможно создать копию входного файла */
+    OutputFileCannotBeCreated,      /*!< Невозможно создать выходной файл */
 
-    // Ошибки формата XML (общие)
-    Parsing,                       // Ошибка разбора XML
-    MissingRootElemnt,              // Отсутствие корневого элемента <root>
-    UnexpectedElement,              // Присутствует элемент, который не должен быть в текущей вложенности
-    UnexpectedAttribute,            // Присутствует атрибут, который не должен быть в текущем элементе
-    MissingRequiredChildElement,    // У элемента отсутствует необходимый атрибут
-    MissingRequiredAttribute,       // У элемента отсутствует необходимый дочерний элемент
-    DuplicateElement,               // Необходимый элемент встречается более допустимого количества раз
-    DuplicateAttribute,             // Необходимый атрибут встречается более допустимого количества раз
-    EmptyElementValue,              // Значение элемента не заполнено
-    EmptyAttributeName,             // Значение атрибута не заполнено
-    ParamsCountFunctionMissmatch,   // Количество параметров в "expression" не соответствует "paramsCount"
-    InputSizeExceeded,              // Превышен допустимый текстовый размер входных данных
-    InputElementsExceeded,          // Превышено допустимое количество элементов
-    // Ошибки формата XML (элемент <expression>)
-    UndefinedId,                // Используется переменная, функция или пользовательский тип, которые отсутствуют в соответствующих элементах
-    InvalidSymbol,              // В выражении присутствует недопустимый символ
-    InputDataExprSizeExceeded,  // В выражении превышен допустимый размер входных данных
-    MissingOperand,             // Для операции отсутствует необходимое количество операндов
-    MissingOperations,          // Для операнда отсутствует необходимое количество операций
-    MultipleIncrementDecrement, // Используется более одного инкремента или декремента для одной и той же переменной
-    NeverUsedElement,           // Переменная, функция или пользовательский тип объявленные в элементах, не были использованы ни разу.
+    // Общие ошибки XML
+    Parsing,                         /*!< Ошибка разбора XML */
+    MissingRootElemnt,              /*!< Отсутствует корневой элемент <root> */
+    UnexpectedElement,              /*!< Неожиданный элемент в текущей структуре */
+    UnexpectedAttribute,            /*!< Неожиданный атрибут в текущем элементе */
+    MissingRequiredChildElement,    /*!< Отсутствует необходимый дочерний элемент */
+    MissingRequiredAttribute,       /*!< Отсутствует необходимый атрибут */
+    DuplicateElement,               /*!< Повторяющийся элемент */
+    DuplicateAttribute,             /*!< Повторяющийся атрибут */
+    EmptyElementValue,              /*!< Значение элемента не указано */
+    EmptyAttributeName,             /*!< Имя атрибута не указано */
+    ParamsCountFunctionMissmatch,   /*!< Несоответствие количества параметров и описания */
+    InputSizeExceeded,              /*!< Превышен допустимый размер входных данных */
+    InputElementsExceeded,          /*!< Превышено количество допустимых элементов */
 
-    // Ошибки формата XML (элемент <function>)
-    ParamsCountDescriptionDifference, // Количество замен участка в <description> больше чем принимает функция
+    // Ошибки элемента <expression>
+    UndefinedId,                    /*!< Неопределённый идентификатор */
+    InvalidSymbol,                  /*!< Недопустимый символ в выражении */
+    InputDataExprSizeExceeded,      /*!< Превышен размер выражения */
+    MissingOperand,                 /*!< Отсутствует операнд */
+    MissingOperations,              /*!< Отсутствует операция */
+    MultipleIncrementDecrement,     /*!< Повторное использование ++ или -- */
+    NeverUsedElement,               /*!< Элемент не был использован */
 
-    // Ошибки формата XML (атрибут "name")
-    NonUniqueName,          // У атрибута "name" не уникальное название
-    InvalidName,    // В значении атрибута "name" используются недопустимые символы
+    // Ошибки элемента <function>
+    ParamsCountDescriptionDifference, /*!< Несоответствие количества замен в <description> и параметров */
 
-    // Ошибки формата XML (атрибут "type")
-    UnidentifedType,    // В значении атрибута "type" указан неидентифицированный тип данных
-    InvalidType,        // В значении атрибута "type" используются недопустимые символы
+    // Ошибки атрибута "name"
+    NonUniqueName,                  /*!< Имя не уникально */
+    InvalidName,                    /*!< Имя содержит недопустимые символы */
 
-    // Ошибки формата XML (атрибут "paramsCount")
-    InvalidParamsCount, // У атрибута "paramsCount" указан неправильный формат данных
-    MissingCases,       // У описания отсутствует обязательный падеж    28
-    MissingReplacementArguments, // Отсутствие аргумента для замены
-    UnexpectedCaseType,     // У элемента case отсутствует ожидаемое значение аттрибута type
-    IncorrectCaseInPlaceHolder, // Неправильно указан падеж в плейсхолдере
-    VariableWithVoidType        // Переменная с типом войд
+    // Ошибки атрибута "type"
+    UnidentifedType,                /*!< Неизвестный тип данных */
+    InvalidType,                    /*!< Неверное значение типа */
+
+    // Ошибки атрибута "paramsCount"
+    InvalidParamsCount,            /*!< Неверный формат значения атрибута paramsCount */
+
+    // Ошибки описаний и падежей
+    MissingCases,                  /*!< Отсутствует обязательный падеж */
+    MissingReplacementArguments,  /*!< Отсутствуют аргументы для замены */
+    UnexpectedCaseType,           /*!< Отсутствует атрибут type в элементе падежа */
+    IncorrectCaseInPlaceHolder    /*!< Неправильно указан падеж в плейсхолдере */
 };
 
+/*!
+ * \brief Класс, представляющий исключение при обработке XML.
+ */
 class TEException
 {
 public:
 
+    /*!
+     * \brief Конструктор исключения с указанием всех параметров.
+     * \param[in] errorType Тип ошибки.
+     * \param[in] filename Имя файла, в котором произошла ошибка.
+     * \param[in] line Номер строки.
+     * \param[in] args Аргументы для шаблона ошибки.
+     */
     TEException(const ErrorType errorType, const QString &filename, const int line, const QList<QString> args = QList<QString>());
+
+    /*!
+     * \brief Конструктор исключения без имени файла.
+     * \param[in] errorType Тип ошибки.
+     * \param[in] line Номер строки.
+     * \param[in] args Аргументы для шаблона ошибки.
+     */
     TEException(const ErrorType errorType, const int line, const QList<QString> args = QList<QString>());
+
+    /*!
+     * \brief Конструктор исключения без строки.
+     * \param[in] errorType Тип ошибки.
+     * \param[in] filename Имя файла.
+     * \param[in] args Аргументы для шаблона ошибки.
+     */
     TEException(const ErrorType errorType, const QString &filename, const QList<QString> args = QList<QString>());
+
+    /*!
+     * \brief Конструктор исключения только с типом ошибки.
+     * \param[in] errorType Тип ошибки.
+     * \param[in] args Аргументы для шаблона ошибки.
+     */
     TEException(const ErrorType errorType, const QList<QString> args = QList<QString>());
 
+    /*!
+     * \brief Получение текстового описания ошибки.
+     * \return Строка с описанием.
+     */
     QString what() const;
+
+    /*!
+     * \brief Получение типа ошибки.
+     * \return Тип ошибки.
+     */
     ErrorType getErrorType() const;
+
+    /*!
+     * \brief Получение строки, на которой произошла ошибка.
+     * \return Номер строки.
+     */
     int getLine() const;
+
+    /*!
+     * \brief Получение списка аргументов ошибки.
+     * \return Список строк-аргументов.
+     */
     QList<QString> getArgs() const;
 
+    /*!
+     * \brief Подстановка аргументов в шаблон сообщения.
+     * \param[in] pattern Шаблон с плейсхолдерами.
+     * \param[in] args Аргументы для подстановки.
+     * \return Строка с подставленными значениями.
+     */
     QString replacePlaceholders(QString pattern, const QList<QString> args) const;
+
+    /*!
+     * \brief Отображение имён ошибок по типу.
+     */
     static const QHash<ErrorType, QString> ErrorTypeNames;
 
 private:
-
-    ErrorType errorType; // Тип ошибки
-    QString filename;    // Файл в котором произошла ошибка
-    int line;            // Строка, на которой произошла ошибка
-    QList<QString> args; // Аргументы, которые будут подставлены в шаблон ошибки
+    ErrorType errorType; /*!< Тип ошибки */
+    QString filename;    /*!< Имя файла */
+    int line;            /*!< Номер строки */
+    QList<QString> args; /*!< Аргументы ошибки */
 };
 
 #endif // TEEXCEPTION_H
