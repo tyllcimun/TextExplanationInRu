@@ -20,7 +20,6 @@ private:
     /////////////////////////////////////////////////
 
     static QDomDocument readXML(const QString& filePath, QList<TEException>& errors );
-    static bool checkFileReadAccess(const QString& filePath);
     static QTemporaryFile* createTempCopy(const QString &sourceFilePath, QList<TEException>& errors);
 
     //////////////////////////////////////////////////

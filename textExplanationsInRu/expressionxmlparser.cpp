@@ -52,30 +52,6 @@ QDomDocument ExpressionXmlParser::readXML(const QString& inputFilePath, QList<TE
     return doc;
 }
 
-bool ExpressionXmlParser::checkFileReadAccess(const QString &filePath)
-{
-
-    // Пустая строка передана как имя файла
-    if (filePath.isEmpty()) {
-        return false;
-    }
-
-    QFile file(filePath);
-    // Файл не существует
-    if (!file.exists()) {
-        return false;
-    }
-
-    // Файл не открывается
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return false;
-    }
-
-    file.close();
-    return true;
-
-}
-
 QTemporaryFile *ExpressionXmlParser::createTempCopy(const QString &sourceFilePath, QList<TEException>& errors) {
 
     QTemporaryFile* tempFile = new QTemporaryFile(QDir(QCoreApplication::applicationDirPath()).filePath("temp_XXXXXX"));
