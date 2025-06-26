@@ -438,197 +438,101 @@ QString Expression::sanitizeDataType(const QString& dataType) {
 
 ExpressionNode* Expression::expressionToNodes() {
     QSet<QString> customDataTypes = getCustomDataTypes();
-    // Разделяем выражение на лексемы
     QStringList tokens = splitExpression(*this->getExpression());
-    //...Считаем, что стек узлов пустой
     QStack<ExpressionNode*> nodeStack;
-    //...Считаем что количество операций = 0
     int operationCounter = 0;
-    //...Считаем что ни один элемент не использован
     QSet<QString> usedElements;
 
-    QStringList::const_iterator i;
-    // Для каждой лексемы и пока количество операций не превышает 20
-    for(i = tokens.constBegin(); i != tokens.constEnd() && operationCounter <= 20; i++){
-        // Получить тип лексемы
-        EntityType nodeType = getEntityTypeByStr(*i);
-        // Если лексема является операцией
-        if(nodeType == EntityType::Operation){
-            // Увеличить счетчик операций
-            operationCounter++;
-            //Определить тип операции
-            OperationType operType = getOperationTypeByStr(*i);
-            ExpressionNode* right = nullptr;
-            ExpressionNode* left = nullptr;
-            // Если операция – инкремент или декремент и следующая операция такого же типа
-            if(!nodeStack.empty() && (operType == OperationType::PostfixIncrement || operType == OperationType::PrefixIncrement
-                                       || operType == OperationType::PostfixDecrement || operType == OperationType::PrefixDecrement) && i+1 != tokens.end())
-            {
-                OperationType newOperType = getOperationTypeByStr(*(i+1));
-                if((newOperType == OperationType::PostfixIncrement || newOperType == OperationType::PrefixIncrement
-                     || newOperType == OperationType::PostfixDecrement || newOperType == OperationType::PrefixDecrement))
-                    throw TEException(ErrorType::MultipleIncrementDecrement, QList<QString>{nodeStack.top()->getValue()});
-            }
-            // Если в стеке есть два операнда и операция бинарная
-            if(nodeStack.size() >= 2 && OperationMap.value(*i).arity == OperationArity::Binary){
-                // извлекаем из стека
-                right = nodeStack.pop();
-                left = nodeStack.pop();
-            }
-            //Иначе если в стеке один операнд и операция минус или в стеке не менее одного операнда и операция унарная
-            else if((nodeStack.size() == 1 && operType == OperationType::Subtraction) ||
-                     (nodeStack.size() >= 1 && OperationMap.value(*i).arity == OperationArity::Unary)){
-                // извлекаем один операнд
-                left = nodeStack.pop();
-                if(operType == OperationType::Subtraction) operType = OperationType::UnaryMinus;
-            }
-            // Иначе если операндов меньше чем два
-            else if (nodeStack.size() < 2) {
-                // выдать ошибку об отсутствии операнда у операции
-                throw TEException(ErrorType::MissingOperand, QList<QString>{*i});
-            }
-            // Иначе если операндов больше чем два
-            else if (nodeStack.size() > 2) {
-                // выдать ошибку об отсутствии операции у операнда
-                throw TEException(ErrorType::MissingOperations, QList<QString>{nodeStack.pop()->getValue()});
-            }
-            nodeStack.push(new ExpressionNode(EntityType::Operation, *i, left, right, "", operType));
+    for (const QString& token : tokens) {
+        EntityType nodeType = getEntityTypeByStr(token);
+
+        switch (nodeType) {
+        case EntityType::Operation:
+            processOperationNode(token, nodeStack, operationCounter);
+            break;
+        case EntityType::Const:
+            processConstNode(token, nodeStack);
+            break;
+        case EntityType::Variable:
+            processVariableNode(token, nodeStack, usedElements, customDataTypes);
+            break;
+        case EntityType::Function:
+            processFunctionNode(token, nodeStack);
+            break;
+        default:
+            throw TEException(ErrorType::UndefinedId, QList<QString>{token});
         }
-        // Иначе если лексема является константой
-        else if(nodeType == EntityType::Const){
-            if(i->startsWith("\"") && i->endsWith("\"")) nodeStack.push(new ExpressionNode(EntityType::Const, *i, nullptr, nullptr, "string"));
-            else nodeStack.push(new ExpressionNode(EntityType::Const, *i, nullptr, nullptr));
+
+        if (operationCounter > 20) {
+            throw TEException(ErrorType::InputDataExprSizeExceeded);
         }
-        // Иначе если лексема является переменной
-        else if(nodeType == EntityType::Variable){
-            QString className;
-            // Определить тип данных переменной
-            QString dataType = getVariables()->value(*i).type;
-            // если тип данных не определен
-            if(dataType == ""){
-                if(!nodeStack.empty()){
-                    ExpressionNode *rightSibling = nodeStack.top();
-                    // если следующая лексема существует
-                    if(i+1 != tokens.end()){
-                        // если эта лексема обращение к полю
-                        if(*(i+1) == "." || *(i+1) == "->"){
-                            className = sanitizeDataType(rightSibling->getDataType());
-                            // то найдем переменную по пользовательскому типу данных
-                            dataType = getVariableByNameFromCustomData(*i, rightSibling->getDataType()).type;
-                        }
-                        // иначе если эта лексема обращение к статическому элементу
-                        else if(*(i+1) == "::"){
-                            // если является вариантом перечисления, то считаем имя перечисления типом данных
-                            dataType = isEnumValue(*i, rightSibling->getValue()) ? rightSibling->getValue() : "";
-                            className = sanitizeDataType(dataType);
-                        }
-                    }
-                }
-            }
-            // если тип данных был определен
-            if (dataType != ""){
-                dataType = sanitizeDataType(dataType);
-                if(customDataTypes.contains(dataType) || DataTypes.contains(dataType)){
-                    if(customDataTypes.contains(dataType)) usedElements.insert(dataType);
-                    // добавить элемент в стек
-                    nodeStack.push(new ExpressionNode(EntityType::Variable, *i, nullptr, nullptr, dataType));
-                    // считать использованным элементом
-                    if(!className.isEmpty()){
-                        usedElements.insert(className + "." + *i);
-                        usedElements.insert(className);
-                    }
-                    else usedElements.insert(*i);
-                }
-                else if(dataType == "void") throw TEException(ErrorType::VariableWithVoidType, QList<QString>{*i});
-                else throw TEException(ErrorType::UnidentifedType, QList<QString>{dataType});
-            }
-            // иначе ошибка о неидентифицированном значении
-            else throw TEException(ErrorType::UndefinedId, QList<QString>{*i});
-        }
-        else if (nodeType == EntityType::Enum){
-            nodeStack.push(new ExpressionNode(EntityType::Enum, *i, nullptr, nullptr, ""));
-            usedElements.insert(*i);
-        }
-        // Иначе если лексема яаляется функцией
-        else if (nodeType == EntityType::Function) {
-            // Определить количество аргументов функции
-            int argCountStart = i->indexOf('(');
-            int argCountEnd = i->indexOf(')');
-            int argCount = i->mid(argCountStart + 1, argCountEnd - argCountStart - 1).toInt();
-            QString funcName = i->left(argCountStart);
-            // Определить возвращаемый тип данных
-            QString funcDataType = sanitizeDataType(getFunctions()->value(funcName).type);
-            QString className;
-            // если возвращаемый тип данных не был определен
-            if(funcDataType == ""){
-                if(!nodeStack.empty()){
-                    ExpressionNode *rightSibling = nodeStack.top();
-                    // если следующая лексема существует
-                    if(i+1 != tokens.end()){
-                        // если эта лексема обращение к полю
-                        if(*(i+1) == "." || *(i+1) == "->"){
-                            // то найдем функцию по пользовательскому типу данных
-                            funcDataType = sanitizeDataType(getFunctionByNameFromCustomData(funcName, rightSibling->getDataType()).type);
-                            className = sanitizeDataType(rightSibling->getDataType());
-                        }
-                    }
-                }
-            }
-            // если тип данных был определен
-            if(funcDataType != ""){
-                funcDataType = sanitizeDataType(funcDataType);
-                // Если количество параметров в выражении не соостветствует количеству параметров в атрибуте функции,
-                // то вызвать ошибку о несоответствии параметров
-                if(argCount != getFunctions()->value(funcName).paramsCount)
-                    throw TEException(ErrorType::ParamsCountFunctionMissmatch, QList<QString>{*i});
-                QList<ExpressionNode*>* functionArgs = new QList<ExpressionNode*>();
-                // Если в стеке операндов меньше чем аргументов у функции
-                if(nodeStack.size() < argCount){
-                    // Вызываем ошибку об отсутствии операнда
-                    throw TEException(ErrorType::MissingOperand, QList<QString>{*i});
-                }
-                // Иначе
-                else{
-                    // В соответствии с количеством параметров извлекаем операнды
-                    for (int j = 0; j < argCount; j++) {
-                        functionArgs->prepend(nodeStack.pop());
-                    }
-                }
-                if(customDataTypes.contains(funcDataType) || DataTypes.contains(funcDataType) || funcDataType == "void"){
-                    if (customDataTypes.contains(funcDataType)) usedElements.insert(funcDataType);
-                    // добавляем функцию в стек
-                    ExpressionNode* functionNode = new ExpressionNode(EntityType::Function, i->left(argCountStart), nullptr, nullptr, funcDataType, OperationType::None, functionArgs);
-                    nodeStack.push(functionNode);
-                    if(!className.isEmpty()){
-                        usedElements.insert(className + "." + i->left(argCountStart));
-                        usedElements.insert(className);
-                    }
-                    else usedElements.insert(i->left(argCountStart));
-                }
-                else throw TEException(ErrorType::UnidentifedType, QList<QString>{funcDataType});
-            }
-            // иначе ошибка о неидентифицированном значении
-            else throw TEException(ErrorType::UndefinedId, QList<QString>{funcName});
-        }
-        // Если тип лексемы неопределен
-        if(nodeType == EntityType::Undefined || nodeType == EntityType::CustomTypeWithFields) throw TEException(ErrorType::UndefinedId, QList<QString>{*i});
     }
 
-    // Если в стеке остался более чем один операнд, то выдать ошибку об отсутствии операции у операнда
-    if(nodeStack.size() > 1)throw TEException(ErrorType::MissingOperations, QList<QString>{nodeStack.pop()->getValue()});
-    // Иначе если выражение было пустым, то дерева нет
-    else if(expression.isEmpty()) return new ExpressionNode();
-    // Иначе если операций в выражении больше 20, то вызвать ошибку о превышении допустимого количества операций
-    else if(operationCounter > 20) throw TEException(ErrorType::InputDataExprSizeExceeded, QList<QString>{operationCounter});
-
-    QSet<QString> allElements = this->getAllNames();
-    QSet<QString> unusedElements = allElements - usedElements;
-
-    if (!unusedElements.isEmpty()) {
-        throw TEException(ErrorType::NeverUsedElement, QList<QString>{unusedElements.values().join(", ")});
+    if (nodeStack.size() != 1) {
+        throw TEException(ErrorType::MissingOperations);
     }
 
     return nodeStack.pop();
+}
+
+void Expression::processOperationNode(const QString& token, QStack<ExpressionNode*>& stack, int& operationCounter) {
+    OperationType operType = getOperationTypeByStr(token);
+
+    if (!stack.empty() && (operType == OperationType::PostfixIncrement || operType == OperationType::PrefixIncrement ||
+                           operType == OperationType::PostfixDecrement || operType == OperationType::PrefixDecrement)) {
+        throw TEException(ErrorType::MultipleIncrementDecrement, QList<QString>{stack.top()->getValue()});
+    }
+
+    ExpressionNode* right = nullptr;
+    ExpressionNode* left = nullptr;
+
+    if (stack.size() >= 2 && OperationMap.value(token).arity == OperationArity::Binary) {
+        right = stack.pop();
+        left = stack.pop();
+    } else if ((stack.size() == 1 && operType == OperationType::Subtraction) ||
+               (stack.size() >= 1 && OperationMap.value(token).arity == OperationArity::Unary)) {
+        left = stack.pop();
+        if (operType == OperationType::Subtraction) operType = OperationType::UnaryMinus;
+    } else {
+        throw TEException(ErrorType::MissingOperand, QList<QString>{token});
+    }
+
+    stack.push(new ExpressionNode(EntityType::Operation, token, left, right, "", operType));
+    operationCounter++;
+}
+
+void Expression::processConstNode(const QString& token, QStack<ExpressionNode*>& stack) {
+    if (token.startsWith("\"") && token.endsWith("\"")) {
+        stack.push(new ExpressionNode(EntityType::Const, token, nullptr, nullptr, "string"));
+    } else {
+        stack.push(new ExpressionNode(EntityType::Const, token, nullptr, nullptr));
+    }
+}
+
+void Expression::processVariableNode(const QString& token, QStack<ExpressionNode*>& stack, QSet<QString>& usedElements, const QSet<QString>& customDataTypes) {
+    QString dataType = sanitizeDataType(getVariables()->value(token).type);
+
+    if (customDataTypes.contains(dataType) || DataTypes.contains(dataType)) {
+        usedElements.insert(dataType);
+        stack.push(new ExpressionNode(EntityType::Variable, token, nullptr, nullptr, dataType));
+    } else {
+        throw TEException(ErrorType::UndefinedId, QList<QString>{token});
+    }
+}
+
+void Expression::processFunctionNode(const QString& token, QStack<ExpressionNode*>& stack) {
+    int argCount = token.mid(token.indexOf('(') + 1, token.indexOf(')') - token.indexOf('(') - 1).toInt();
+    QList<ExpressionNode*>* functionArgs = new QList<ExpressionNode*>();
+
+    if (stack.size() < argCount) {
+        throw TEException(ErrorType::MissingOperand, QList<QString>{token});
+    }
+
+    for (int j = 0; j < argCount; j++) {
+        functionArgs->prepend(stack.pop());
+    }
+
+    stack.push(new ExpressionNode(EntityType::Function, token, nullptr, nullptr, "", OperationType::None, functionArgs));
 }
 
 void Expression::getCustomTypeFields(QSet<QString>& names, const CustomTypeWithFields& customType) {

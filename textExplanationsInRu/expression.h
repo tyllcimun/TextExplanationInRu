@@ -298,6 +298,10 @@ public:
      */
     QString sanitizeDataType(const QString &dataType);
 
+    void processOperationNode(const QString &token, QStack<ExpressionNode *> &stack, int &operationCounter);
+    void processFunctionNode(const QString &token, QStack<ExpressionNode *> &stack);
+    void processVariableNode(const QString &token, QStack<ExpressionNode *> &stack, QSet<QString> &usedElements, const QSet<QString> &customDataTypes);
+    void processConstNode(const QString &token, QStack<ExpressionNode *> &stack);
 private:
     QString expression;                          /*!< Строка выражения */
     QHash<QString, Variable> variables;          /*!< Список переменных */
