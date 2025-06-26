@@ -13,6 +13,7 @@ SOURCES += \
     test_iscustomtypewithfileds.cpp \
     test_isfunction.cpp \
     test_isidentifier.cpp \
+    test_isreducibleunaryselfinverse.cpp \
     test_removeconsecutiveduplicates.cpp \
     test_toexplanation.cpp
 
@@ -23,6 +24,7 @@ HEADERS += \
     test_iscustomtypewithfileds.h \
     test_isfunction.h \
     test_isidentifier.h \
+    test_isreducibleunaryselfinverse.h \
     test_removeconsecutiveduplicates.h \
     test_toexplanation.h
 
