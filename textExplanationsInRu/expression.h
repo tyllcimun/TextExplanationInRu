@@ -298,16 +298,18 @@ public:
      */
     QString sanitizeDataType(const QString &dataType);
 
-    void processOperationNode(const QString &token, QStack<ExpressionNode *> &stack, int &operationCounter);
-    void processFunctionNode(const QString &token, QStack<ExpressionNode *> &stack);
-    void processVariableNode(const QString &token, QStack<ExpressionNode *> &stack, QSet<QString> &usedElements, const QSet<QString> &customDataTypes);
-    void processConstNode(const QString &token, QStack<ExpressionNode *> &stack);
-    QHash<Case, QString> processOperationExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className, OperationType parentOperType) const;
-    QHash<Case, QString> processConstExplanation(const ExpressionNode *node) const;
-    QHash<Case, QString> processFunctionExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className) const;
-    QHash<Case, QString> processVariableExplanation(const ExpressionNode *node, const QString &className, OperationType parentOperType) const;
-    QHash<Case, QString> buildOperationExplanation(const ExpressionNode *node, const QHash<Case, QString> &descOfLeftNode, const QHash<Case, QString> &descOfRightNode, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const;
-    QHash<Case, QString> handleIncrementOrDecrement(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const;
+    void processOperation(const QString &token, QStack<ExpressionNode *> &nodeStack, int &operationCounter, const QStringList &tokens, QStringList::const_iterator i);
+    void processConst(const QString &token, QStack<ExpressionNode *> &nodeStack);
+    void processVariable(const QString &token, QStack<ExpressionNode *> &nodeStack, QSet<QString> &usedElements, const QSet<QString> &customDataTypes, const QStringList &tokens, QStringList::const_iterator i);
+    void processEnum(const QString &token, QStack<ExpressionNode *> &nodeStack, QSet<QString> &usedElements);
+    void processFunction(const QString &token, QStack<ExpressionNode *> &nodeStack, const QSet<QString> &customDataTypes, QSet<QString> &usedElements, const QStringList &tokens, QStringList::const_iterator i);
+    QString handleVariableTypeInference(const QString &token, QStack<ExpressionNode *> &nodeStack, const QStringList &tokens, QStringList::const_iterator i, QString &className);
+    void finalizeNodeProcessing(QStack<ExpressionNode *> &nodeStack, const QString &expression, int operationCounter, const QSet<QString> &usedElements);
+    QHash<Case, QString> handleEnumNode() const;
+    QHash<Case, QString> handleVariableNode(const ExpressionNode *node, const QString &className, OperationType parentOperType) const;
+    QHash<Case, QString> handleFunctionNode(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className) const;
+    QHash<Case, QString> handleConstNode(const ExpressionNode *node) const;
+    QHash<Case, QString> handleOperationNode(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className, OperationType parentOperType, QHash<Case, QString> &descOfLeftNode, QHash<Case, QString> &descOfRightNode) const;
 private:
     QString expression;                          /*!< Строка выражения */
     QHash<QString, Variable> variables;          /*!< Список переменных */
