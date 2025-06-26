@@ -298,17 +298,114 @@ public:
      */
     QString sanitizeDataType(const QString &dataType);
 
+    /*!
+     * \brief Обрабатывает операцию и добавляет соответствующий узел в стек.
+     * \param[in] token Токен, представляющий операцию.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in,out] operationCounter Счётчик операций в выражении.
+     * \param[in] tokens Полный список токенов выражения.
+     * \param[in] i Итератор текущей позиции в списке токенов.
+     */
     void processOperation(const QString &token, QStack<ExpressionNode *> &nodeStack, int &operationCounter, const QStringList &tokens, QStringList::const_iterator i);
+
+    /*!
+     * \brief Обрабатывает константу и добавляет соответствующий узел в стек.
+     * \param[in] token Токен, представляющий константу.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     */
     void processConst(const QString &token, QStack<ExpressionNode *> &nodeStack);
+
+    /*!
+     * \brief Обрабатывает переменную и добавляет соответствующий узел в стек.
+     * \param[in] token Токен, представляющий переменную.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in,out] usedElements Набор используемых переменных.
+     * \param[in] customDataTypes Набор пользовательских типов данных.
+     * \param[in] tokens Полный список токенов выражения.
+     * \param[in] i Итератор текущей позиции в списке токенов.
+     */
     void processVariable(const QString &token, QStack<ExpressionNode *> &nodeStack, QSet<QString> &usedElements, const QSet<QString> &customDataTypes, const QStringList &tokens, QStringList::const_iterator i);
+
+    /*!
+     * \brief Обрабатывает перечисление (enum) и добавляет соответствующий узел в стек.
+     * \param[in] token Токен, представляющий элемент перечисления.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in,out] usedElements Набор используемых элементов перечисления.
+     */
     void processEnum(const QString &token, QStack<ExpressionNode *> &nodeStack, QSet<QString> &usedElements);
+
+    /*!
+     * \brief Обрабатывает функцию и добавляет соответствующий узел в стек.
+     * \param[in] token Токен, представляющий функцию.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in] customDataTypes Набор пользовательских типов данных.
+     * \param[in,out] usedElements Набор используемых элементов.
+     * \param[in] tokens Полный список токенов выражения.
+     * \param[in] i Итератор текущей позиции в списке токенов.
+     */
     void processFunction(const QString &token, QStack<ExpressionNode *> &nodeStack, const QSet<QString> &customDataTypes, QSet<QString> &usedElements, const QStringList &tokens, QStringList::const_iterator i);
+
+    /*!
+     * \brief Определяет тип переменной на основе контекста.
+     * \param[in] token Токен, представляющий переменную.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in] tokens Полный список токенов выражения.
+     * \param[in] i Итератор текущей позиции в списке токенов.
+     * \param[out] className Название класса, к которому принадлежит переменная.
+     * \return Тип переменной.
+     */
     QString handleVariableTypeInference(const QString &token, QStack<ExpressionNode *> &nodeStack, const QStringList &tokens, QStringList::const_iterator i, QString &className);
+
+    /*!
+     * \brief Завершает обработку узлов и формирует результирующее выражение.
+     * \param[in,out] nodeStack Стек узлов выражения.
+     * \param[in] expression Исходное строковое выражение.
+     * \param[in] operationCounter Счётчик операций в выражении.
+     * \param[in] usedElements Набор используемых элементов.
+     */
     void finalizeNodeProcessing(QStack<ExpressionNode *> &nodeStack, const QString &expression, int operationCounter, const QSet<QString> &usedElements);
+
+    /*!
+     * \brief Обрабатывает узел типа перечисления (enum).
+     * \return Описание узла в формате QHash<Case, QString>.
+     */
     QHash<Case, QString> handleEnumNode() const;
+
+    /*!
+     * \brief Обрабатывает узел типа переменной.
+     * \param[in] node Узел выражения, представляющий переменную.
+     * \param[in] className Название класса, если переменная принадлежит классу.
+     * \param[in] parentOperType Тип родительской операции.
+     * \return Описание узла в формате QHash<Case, QString>.
+     */
     QHash<Case, QString> handleVariableNode(const ExpressionNode *node, const QString &className, OperationType parentOperType) const;
+
+    /*!
+     * \brief Обрабатывает узел типа функции.
+     * \param[in] node Узел выражения, представляющий функцию.
+     * \param[in,out] intermediateDescription Промежуточное описание функции.
+     * \param[in] className Название класса, если функция принадлежит классу.
+     * \return Описание узла в формате QHash<Case, QString>.
+     */
     QHash<Case, QString> handleFunctionNode(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className) const;
+
+    /*!
+     * \brief Обрабатывает узел типа константы.
+     * \param[in] node Узел выражения, представляющий константу.
+     * \return Описание узла в формате QHash<Case, QString>.
+     */
     QHash<Case, QString> handleConstNode(const ExpressionNode *node) const;
+
+    /*!
+     * \brief Обрабатывает узел типа операции.
+     * \param[in] node Узел выражения, представляющий операцию.
+     * \param[in,out] intermediateDescription Промежуточное описание операции.
+     * \param[in] className Название класса, если операция связана с классом.
+     * \param[in] parentOperType Тип родительской операции.
+     * \param[in,out] descOfLeftNode Описание левого поддерева.
+     * \param[in,out] descOfRightNode Описание правого поддерева.
+     * \return Описание узла в формате QHash<Case, QString>.
+     */
     QHash<Case, QString> handleOperationNode(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className, OperationType parentOperType, QHash<Case, QString> &descOfLeftNode, QHash<Case, QString> &descOfRightNode) const;
 private:
     QString expression;                          /*!< Строка выражения */
