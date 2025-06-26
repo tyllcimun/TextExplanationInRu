@@ -131,3 +131,7 @@ build/
 debug/
 realese/
 .qtc_clangd/
+
+input.txt
+*/debug/
+*/release/
