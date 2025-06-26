@@ -215,164 +215,132 @@ QString Expression::ToQstring()
     return result;
 }
 
-QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString& className, OperationType parentOperType) const
-{
-    //...Считать что описание пустое
-    QHash<Case, QString> description = {};
+QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString& className, OperationType parentOperType) const {
+    switch (node->getNodeType()) {
+    case EntityType::Operation:
+        return processOperationExplanation(node, intermediateDescription, className, parentOperType);
+    case EntityType::Const:
+        return processConstExplanation(node);
+    case EntityType::Function:
+        return processFunctionExplanation(node, intermediateDescription, className);
+    case EntityType::Variable:
+        return processVariableExplanation(node, className, parentOperType);
+    case EntityType::Enum:
+        return {};
+    default:
+        throw TEException(ErrorType::UnidentifedType, QList<QString>{node->getDataType()});
+    }
+}
 
-    QHash<Case, QString> descOfRightNode = {};
-    QHash<Case, QString> descOfLeftNode = {};
+QHash<Case, QString> Expression::processOperationExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString& className, OperationType parentOperType) const {
+    QHash<Case, QString> descOfLeftNode;
+    QHash<Case, QString> descOfRightNode;
 
-    //Если тип текущей ноды является операцией, то
-    if(node->getNodeType() == EntityType::Operation) {
-        // если операция унарная и является одной из самообратных и ее можно сократить
-        if(node->isReducibleUnarySelfInverse())
-        {
-            // переходим к узлу, к которому применяются унарные операции
-            description = toExplanation(node->getLeftNode()->getLeftNode(), intermediateDescription, "", node->getOperType());
+    if (node->isReducibleUnarySelfInverse()) {
+        return toExplanation(node->getLeftNode()->getLeftNode(), intermediateDescription, "", node->getOperType());
+    }
+    else if (node->getOperType() == OperationType::Not && node->getLeftNode()->isComparisonOperation()) {
+        return toExplanation(node->getLeftNode(), intermediateDescription, "", node->getOperType());
+    }
+    else if (node->isIncrementOrDecrement()) {
+        return handleIncrementOrDecrement(node, intermediateDescription, parentOperType);
+    } else {
+        descOfLeftNode = toExplanation(node->getLeftNode(), intermediateDescription, "", node->getOperType());
+
+        if (node->getOperType() == OperationType::FieldAccess) {
+            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, node->getLeftNode()->getDataType(), node->getOperType());
+        } else if (node->getOperType() == OperationType::StaticMemberAccess) {
+            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, node->getLeftNode()->getValue(), node->getOperType());
+        } else if (node->getRightNode() != nullptr) {
+            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, "", node->getOperType());
         }
-        // если операция логическое не которое применяется к операции сравнения то
-        else if(node->getOperType() == OperationType::Not && node->getLeftNode()->isComparisonOperation())
-            // получить описание дочернего узла
-            description = toExplanation(node->getLeftNode(), intermediateDescription, "", node->getOperType());
-        //если операция - инкремент или декремент
-        else if(node->isIncrementOrDecrement()){
+    }
+
+    return buildOperationExplanation(node, descOfLeftNode, descOfRightNode, intermediateDescription, parentOperType);
+}
+
+QHash<Case, QString> Expression::processConstExplanation(const ExpressionNode *node) const {
+    QHash<Case, QString> description;
+    for (Case c : {Case::Nominative, Case::Genitive, Case::Dative, Case::Accusative, Case::Instrumental, Case::Prepositional}) {
+        description[c] = node->getValue();
+    }
+    return description;
+}
+
+QHash<Case, QString> Expression::processFunctionExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString& className) const {
+    QHash<Case, QString> description;
+
+    if (!className.isEmpty()) {
+        description = this->getFunctionByNameFromCustomData(node->getValue(), className).description;
+    } else {
+        description = this->getFuncByName(node->getValue()).description;
+    }
+
+    if (node->getFunctionArgs()->count()) {
+        description = ExpressionTranslator::getExplanation(description, argsToDescr(node->getFunctionArgs(), intermediateDescription, "", OperationType::FunctionCall));
+    }
+
+    return description;
+}
+
+QHash<Case, QString> Expression::processVariableExplanation(const ExpressionNode *node, const QString& className, OperationType parentOperType) const {
+    QHash<Case, QString> description;
+
+    if (!className.isEmpty()) {
+        if (parentOperType == OperationType::FieldAccess) {
+            description = this->getVariableByNameFromCustomData(node->getValue(), className).description;
+        } else if (parentOperType == OperationType::StaticMemberAccess) {
+            description = this->getEnumByName(className).values.value(node->getValue());
+        }
+    } else {
+        description = this->getVarByName(node->getValue()).description;
+    }
+
+    return description;
+}
+
+QHash<Case, QString> Expression::buildOperationExplanation(const ExpressionNode *node, const QHash<Case, QString>& descOfLeftNode, const QHash<Case, QString>& descOfRightNode, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const {
+    QHash<Case, QString> description;
+
+    if (parentOperType == node->getOperType()) {
+        if (node->getOperType() == OperationType::Subtraction && node->getLeftNode()->getOperType() != OperationType::Subtraction && node->getRightNode()->getOperType() != OperationType::Subtraction) {
+            description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SubtractionSequence), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
+        } else if (node->getOperType() == OperationType::Division && node->getLeftNode()->getOperType() != OperationType::Division && node->getRightNode()->getOperType() != OperationType::Division) {
+            description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::DivisionSequence), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
+        } else {
+            for (Case c : {Case::Nominative, Case::Genitive, Case::Dative, Case::Accusative, Case::Instrumental, Case::Prepositional}) {
+                description[c] = descOfLeftNode[c] + ", " + descOfRightNode[c];
+            }
+        }
+    } else {
+        description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
+    }
+
+    return description;
+}
+
+QHash<Case, QString> Expression::handleIncrementOrDecrement(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const {
+    QHash<Case, QString> description = toExplanation(node->getLeftNode(), intermediateDescription, "", node->getOperType());
+
+    if (intermediateDescription.isEmpty()) {
+        if (parentOperType != OperationType::None) {
             QHash<Case, QString> secondValueDescription;
             for (Case c : {Case::Nominative, Case::Genitive, Case::Dative, Case::Accusative, Case::Instrumental, Case::Prepositional}) {
                 secondValueDescription[c] = "{2 (в)}";
             }
-            // получить описание инкрементированной/декрементированной переменной
-            description = toExplanation(node->getLeftNode(), intermediateDescription, "", node->getOperType());
-            if(intermediateDescription.isEmpty())
-                if (parentOperType != OperationType::None){
-                    intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{description, secondValueDescription});
-                }
-                else {
-                    if(node->getOperType() == OperationType::PostfixIncrement || node->getOperType() == OperationType::PrefixIncrement)
-                        intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SingleIncrement), QList<QHash<Case, QString>>{description});
-                    else if(node->getOperType() == OperationType::PostfixDecrement || node->getOperType() == OperationType::PrefixDecrement)
-                        intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SingleDecrement), QList<QHash<Case, QString>>{description});
-                }
-            else {
-                QHash<Case, QString> nestedDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{description, secondValueDescription});
-                intermediateDescription = ExpressionTranslator::getExplanation(intermediateDescription, QList<QHash<Case, QString>>{{}, nestedDescription});
+            intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{description, secondValueDescription});
+        } else {
+            if (node->getOperType() == OperationType::PostfixIncrement || node->getOperType() == OperationType::PrefixIncrement) {
+                intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SingleIncrement), QList<QHash<Case, QString>>{description});
+            } else if (node->getOperType() == OperationType::PostfixDecrement || node->getOperType() == OperationType::PrefixDecrement) {
+                intermediateDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SingleDecrement), QList<QHash<Case, QString>>{description});
             }
         }
-        // иначе получаем описание первой ноды сиблинга
-        else descOfLeftNode = toExplanation(node->getLeftNode(), intermediateDescription, "" , node->getOperType());
-
-        //Если тип второй ноды сиблинга является полем, то
-        if(node->getOperType() == OperationType::FieldAccess)
-            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, node->getLeftNode()->getDataType(), node->getOperType()); //##Получить описание второго сиблинга в соответствии с типом первого сиблинга## (Рекурсия)
-        //Если тип второй ноды сиблинга является вариантом перечисления, то
-        else if(node->getOperType() == OperationType::StaticMemberAccess)
-            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, node->getLeftNode()->getValue(), node->getOperType()); //##Получить описание второго сиблинга в соответствии с типом первого сиблинга## (Рекурсия)
-
-        // Иначе если операция бинарная
-        else if(node->getRightNode() != nullptr)
-            descOfRightNode = toExplanation(node->getRightNode(), intermediateDescription, "", node->getOperType()); //##Получить описание второго сиблинга## (Рекурсия)
-
-        if(description.isEmpty()){
-            //Если родительская нода является операцией такого же типа что и текущая, то
-            if(parentOperType == node->getOperType()){
-                if(node->getOperType() == OperationType::Subtraction && node->getLeftNode()->getOperType() != OperationType::Subtraction && node->getRightNode()->getOperType() != OperationType::Subtraction)
-                    description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::SubtractionSequence), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-                else if(node->getOperType() == OperationType::Division && node->getLeftNode()->getOperType() != OperationType::Division && node->getRightNode()->getOperType() != OperationType::Division)
-                    description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::DivisionSequence), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-
-                //считать что описание это перечисление сиблингов через запятую
-                else{
-                    for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
-                                   Case::Accusative, Case::Instrumental, Case::Prepositional}) {
-                        description[c] = descOfLeftNode[c] + ", " + descOfRightNode[c];
-                    }
-                }
-            }
-            else if((node->getOperType() == OperationType::Subtraction && node->getLeftNode()->getOperType() == OperationType::Subtraction) ||
-                     (node->getOperType() == OperationType::Division && node->getLeftNode()->getOperType() == OperationType::Division))
-                for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
-                               Case::Accusative, Case::Instrumental, Case::Prepositional}) {
-                    description[c] = descOfLeftNode[c] + ", " + descOfRightNode[c];
-                }
-            //иначе если операция - разыменование указателя которое применяется к операции
-            else if(node->getOperType() == OperationType::Dereference && node->getLeftNode()->getNodeType() == EntityType::Operation)
-                description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::PointerIndexAccess), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-
-            else if(node->isComparisonOperation() && parentOperType == OperationType::Not){
-                description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(InverseComparisonOperationsMap.value(node->getOperType())), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-            }
-            //Иначе
-            else{
-                // Если дочерние узлы - строки а операция - сложение
-                if(node->getLeftNode()->getDataType() == "string" && node->getLeftNode()->getDataType() == node->getRightNode()->getDataType() && node->getOperType() == OperationType::Addition)
-                    //Считать что описание это ##сформированная в соответствии с типом операции и операндами строка##, а операция - конкатенация
-                    description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(OperationType::Concatenation), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-                // иначе Считать что описание это ##сформированная в соответствии с типом операции и операндами строка##
-                else description = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{descOfLeftNode, descOfRightNode});
-            }
-        }
-    }
-    //Иначе если тип текущей ноды является  константой, то
-    else if(node->getNodeType() == EntityType::Const){
-        //считать что описание это константа
-        for (Case c : {Case::Nominative, Case::Genitive, Case::Dative,
-                       Case::Accusative, Case::Instrumental, Case::Prepositional}) {
-            description[c] = node->getValue();
-        }
+    } else {
+        QHash<Case, QString> nestedDescription = ExpressionTranslator::getExplanation(ExpressionTranslator::Templates.value(node->getOperType()), QList<QHash<Case, QString>>{description});
+        intermediateDescription = ExpressionTranslator::getExplanation(intermediateDescription, QList<QHash<Case, QString>>{{}, nestedDescription});
     }
 
-    //Иначе если тип текущей ноды является функцией, то
-    else if(node->getNodeType() == EntityType::Function){
-        //Если поле принадлежит классу, то
-        if(!className.isEmpty()){
-            //Считать что описание это ##полученное описание функции## класса
-            description = this->getFunctionByNameFromCustomData(node->getValue(), className).description;
-        }
-        //Иначе
-        else{
-            //Считать что описание это ##полученное описание функции##.
-            description = this->getFuncByName(node->getValue()).description;
-        }
-
-        //Если у функции есть хотя бы один аргумент, то
-        if(node->getFunctionArgs()->count()){
-            //##Заполнить описание данными из аргументов функции##.
-            description = ExpressionTranslator::getExplanation(description, argsToDescr(node->getFunctionArgs(), intermediateDescription, "", OperationType::FunctionCall));
-        }
-    }
-    //Иначе если тип текущей ноды является переменной, то
-    else if(node->getNodeType() == EntityType::Variable){
-        //Если переменная является полем пользовательского типа
-        if(className != ""){
-            if(parentOperType == OperationType::FieldAccess){
-                //считать что описание это ##полученное описание переменной класса##
-                description = this->getVariableByNameFromCustomData(node->getValue(), className).description;
-            }
-            else if(parentOperType == OperationType::StaticMemberAccess){
-                //считать что описание это ##полученное описание варианта перечисления##
-                description = this->getEnumByName(className).values.value(node->getValue());
-            }
-        }
-        //Иначе
-        else{
-            //считать что описание это ##полученное описание переменной##.
-            description = this->getVarByName(node->getValue()).description;
-        }
-    }
-    //Иначе если тип текущей ноды является перечисление, то
-    else if(node->getNodeType() == EntityType::Enum){
-        description = {};
-    }
-
-    //Иначе
-    else{
-        //Вызвать ошибку о несогласованности типов.
-        throw TEException(ErrorType::UnidentifedType, QList<QString>{node->getDataType()});
-    }
-
-    if(!intermediateDescription.isEmpty() && parentOperType==OperationType::None) description = ExpressionTranslator::getExplanation(intermediateDescription, QList<QHash<Case, QString>>{{}, description});
-
-    //Вернуть описание
     return description;
 }
 

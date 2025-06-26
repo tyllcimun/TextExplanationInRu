@@ -302,6 +302,12 @@ public:
     void processFunctionNode(const QString &token, QStack<ExpressionNode *> &stack);
     void processVariableNode(const QString &token, QStack<ExpressionNode *> &stack, QSet<QString> &usedElements, const QSet<QString> &customDataTypes);
     void processConstNode(const QString &token, QStack<ExpressionNode *> &stack);
+    QHash<Case, QString> processOperationExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className, OperationType parentOperType) const;
+    QHash<Case, QString> processConstExplanation(const ExpressionNode *node) const;
+    QHash<Case, QString> processFunctionExplanation(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, const QString &className) const;
+    QHash<Case, QString> processVariableExplanation(const ExpressionNode *node, const QString &className, OperationType parentOperType) const;
+    QHash<Case, QString> buildOperationExplanation(const ExpressionNode *node, const QHash<Case, QString> &descOfLeftNode, const QHash<Case, QString> &descOfRightNode, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const;
+    QHash<Case, QString> handleIncrementOrDecrement(const ExpressionNode *node, QHash<Case, QString> &intermediateDescription, OperationType parentOperType) const;
 private:
     QString expression;                          /*!< Строка выражения */
     QHash<QString, Variable> variables;          /*!< Список переменных */
