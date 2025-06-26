@@ -366,12 +366,6 @@ public:
     void finalizeNodeProcessing(QStack<ExpressionNode *> &nodeStack, const QString &expression, int operationCounter, const QSet<QString> &usedElements);
 
     /*!
-     * \brief Обрабатывает узел типа перечисления (enum).
-     * \return Описание узла в формате QHash<Case, QString>.
-     */
-    QHash<Case, QString> handleEnumNode() const;
-
-    /*!
      * \brief Обрабатывает узел типа переменной.
      * \param[in] node Узел выражения, представляющий переменную.
      * \param[in] className Название класса, если переменная принадлежит классу.

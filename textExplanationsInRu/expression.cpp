@@ -234,7 +234,7 @@ QHash<Case, QString> Expression::toExplanation(const ExpressionNode *node, QHash
         description = handleVariableNode(node, className, parentOperType);
     }
     else if(node->getNodeType() == EntityType::Enum) {
-        description = handleEnumNode();
+        description = {};
     }
     else {
         throw TEException(ErrorType::UnidentifedType, QList<QString>{node->getDataType()});
@@ -377,11 +377,6 @@ QHash<Case, QString> Expression::handleVariableNode(const ExpressionNode *node, 
         description = this->getVarByName(node->getValue()).description;
     }
     return description;
-}
-
-QHash<Case, QString> Expression::handleEnumNode() const
-{
-    return {};
 }
 
 QString Expression::getExplanationInRu()
