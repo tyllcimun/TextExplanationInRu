@@ -8,6 +8,7 @@
 #include "test_isidentifier.h"
 #include "test_removeconsecutiveduplicates.h"
 #include "test_toexplanation.h"
+#include "test_isreducibleunaryselfinverse.h"
 
 int runTest(int argc, char *argv[]) //-- Нужно, чтобы парсер тестов нашёл этот тест, поэтому запускаем мы его из main
 {
@@ -52,6 +53,11 @@ int runTest(int argc, char *argv[]) //-- Нужно, чтобы парсер т�
     try {
         test_toExplanation toExplanation;
         result |= QTest::qExec(&toExplanation, argc, argv);
+    } catch (...) {}
+
+    try {
+        test_isReducibleUnarySelfInverse isReducibleUnarySelfInverse;
+        result |= QTest::qExec(&isReducibleUnarySelfInverse, argc, argv);
     } catch (...) {}
 
     return result;

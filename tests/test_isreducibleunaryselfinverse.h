@@ -2,6 +2,7 @@
 #define TEST_ISREDUCIBLEUNARYSELFINVERSE_H
 
 #include <QObject>
+#include "expressionnode.h"
 
 class test_isReducibleUnarySelfInverse : public QObject
 {
@@ -9,7 +10,9 @@ class test_isReducibleUnarySelfInverse : public QObject
 public:
     explicit test_isReducibleUnarySelfInverse(QObject *parent = nullptr);
 
-signals:
+private slots:
+    void isReducibleUnarySelfInverse();
+    void isReducibleUnarySelfInverse_data();
 };
 
 #endif // TEST_ISREDUCIBLEUNARYSELFINVERSE_H
