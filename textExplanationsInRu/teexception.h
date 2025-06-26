@@ -55,13 +55,14 @@ enum class ErrorType {
     InvalidType,                    /*!< Неверное значение типа */
 
     // Ошибки атрибута "paramsCount"
-    InvalidParamsCount,            /*!< Неверный формат значения атрибута paramsCount */
+    InvalidParamsCount,             /*!< Неверный формат значения атрибута paramsCount */
 
     // Ошибки описаний и падежей
-    MissingCases,                  /*!< Отсутствует обязательный падеж */
-    MissingReplacementArguments,  /*!< Отсутствуют аргументы для замены */
-    UnexpectedCaseType,           /*!< Отсутствует атрибут type в элементе падежа */
-    IncorrectCaseInPlaceHolder    /*!< Неправильно указан падеж в плейсхолдере */
+    MissingCases,                   /*!< Отсутствует обязательный падеж */
+    MissingReplacementArguments,    /*!< Отсутствуют аргументы для замены */
+    UnexpectedCaseType,             /*!< Отсутствует атрибут type в элементе падежа */
+    IncorrectCaseInPlaceHolder,     /*!< Неправильно указан падеж в плейсхолдере */
+    VariableWithVoidType            /*!< Переменная с типом войд  */
 };
 
 /*!

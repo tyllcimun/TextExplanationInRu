@@ -123,35 +123,6 @@ QString ExpressionXmlParser::fixXmlExpression(const QString& xmlString) {
     return result;
 }
 
-QString ExpressionXmlParser::fixXmlDescriptions(const QString& xmlString) {
-    QString result = xmlString;
-
-    // Обработка всех тегов <description> (с конца)
-    int descriptionEnd = result.length();
-    while ((descriptionEnd = result.lastIndexOf("</description>", descriptionEnd)) != -1) {
-        int descriptionStart = result.lastIndexOf("<description>", descriptionEnd);
-        if (descriptionStart == -1) break;
-
-        // Вычисляем позиции содержимого
-        int contentStart = descriptionStart + QString("<description>").length();
-        int contentLength = descriptionEnd - contentStart;
-
-        // Извлекаем содержимое
-        QString content = result.mid(contentStart, contentLength);
-
-        // Заменяем специальные символы
-        QString escapedContent = escapeXmlText(content);
-
-        // Заменяем оригинальное содержимое на обработанное
-        result.replace(contentStart, contentLength, escapedContent);
-
-        // Продолжаем поиск с предыдущей позиции
-        descriptionEnd = descriptionStart;
-    }
-
-    return result;
-}
-
 QString ExpressionXmlParser::fixXmlCaseTags(const QString& xmlString) {
     QString result = xmlString;
 
@@ -485,17 +456,6 @@ int ExpressionXmlParser::parseParamsCount(const QDomElement& element, QList<TEEx
     if(count < 0 || count > functionParamsMaxCount) errors.append(TEException(ErrorType::InvalidParamsCount, element.lineNumber(), QList<QString>{QString::number(count)}));
 
     return count;
-}
-
-QString ExpressionXmlParser::parseDescription(const QDomElement &_description, QList<TEException>& errors) {
-
-    QString res = _description.text();
-
-    if(res.isEmpty()) errors.append(TEException(ErrorType::EmptyElementValue, _description.lineNumber(), QList<QString>{"description"}));
-
-    if(res.length() > descMaxLength) errors.append(TEException(ErrorType::InputSizeExceeded, _description.lineNumber(), QList<QString>{res, QString::number(res.length()), QString::number(descMaxLength)}));
-
-    return res;
 }
 
 QHash<Case, QString> ExpressionXmlParser::parseCases(const QDomElement &parentElement, QList<TEException>& errors)
