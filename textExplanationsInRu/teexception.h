@@ -79,7 +79,7 @@ public:
      * \param[in] line Номер строки.
      * \param[in] args Аргументы для шаблона ошибки.
      */
-    TEException(const ErrorType errorType, const QString &filename, const int line, const QList<QString> args = QList<QString>());
+    explicit TEException(const ErrorType errorType, const QString &filename, const int line, const QList<QString> args = QList<QString>());
 
     /*!
      * \brief Конструктор исключения без имени файла.
@@ -87,7 +87,7 @@ public:
      * \param[in] line Номер строки.
      * \param[in] args Аргументы для шаблона ошибки.
      */
-    TEException(const ErrorType errorType, const int line, const QList<QString> args = QList<QString>());
+    explicit TEException(const ErrorType errorType, const int line, const QList<QString> args = QList<QString>());
 
     /*!
      * \brief Конструктор исключения без строки.
@@ -95,14 +95,14 @@ public:
      * \param[in] filename Имя файла.
      * \param[in] args Аргументы для шаблона ошибки.
      */
-    TEException(const ErrorType errorType, const QString &filename, const QList<QString> args = QList<QString>());
+    explicit TEException(const ErrorType errorType, const QString &filename, const QList<QString> args = QList<QString>());
 
     /*!
      * \brief Конструктор исключения только с типом ошибки.
      * \param[in] errorType Тип ошибки.
      * \param[in] args Аргументы для шаблона ошибки.
      */
-    TEException(const ErrorType errorType, const QList<QString> args = QList<QString>());
+    explicit TEException(const ErrorType errorType, const QList<QString> args = QList<QString>());
 
     /*!
      * \brief Получение текстового описания ошибки.

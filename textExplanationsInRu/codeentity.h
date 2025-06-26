@@ -8,13 +8,13 @@
 
 #include <QList>
 #include <QHash>
-#include <QSet>
 #include <QString>
+#include <QSet>
 
 /*!
  * \brief Перечисление падежей для описания сущностей.
  */
-enum class Case{
+enum class Case {
     Nominative,     /*!< Именительный */
     Genitive,       /*!< Родительный */
     Dative,         /*!< Дательный */
@@ -130,7 +130,6 @@ extern const QHash<OperationType, QString> OperationTypeNames;
  * \brief Структура, описывающая переменную.
  */
 struct Variable {
-
     QString name;                       /*!< Имя переменной */
     QString type;                       /*!< Тип переменной */
     QHash<Case, QString> description;   /*!< Описание в разных падежах */
@@ -138,7 +137,7 @@ struct Variable {
     /*!
      * \brief Конструктор переменной.
      */
-    Variable(const QString& name = "", const QString& type = "", const QHash<Case, QString>& description = {});
+    explicit Variable(const QString& name = "", const QString& type = "", const QHash<Case, QString>& description = {});
 
     /*!
      * \brief Преобразует переменную в строку.
@@ -160,7 +159,7 @@ struct Function {
     /*!
      * \brief Конструктор функции.
      */
-    Function(const QString& name = "", const QString& type = "", int paramsCount = 0, const QHash<Case, QString>& description = {});
+    explicit Function(const QString& name = "", const QString& type = "", int paramsCount = 0, const QHash<Case, QString>& description = {});
 
     /*!
      * \brief Преобразует функцию в строку.
@@ -181,38 +180,38 @@ struct CustomTypeWithFields {
     /*!
      * \brief Конструктор пользовательского типа.
      */
-    CustomTypeWithFields(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+    explicit CustomTypeWithFields(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
 
     /*!
      * \brief Преобразует тип в строку.
      * \param[in] startLine Префикс.
      * \return Строка с описанием.
      */
-    QString toQString(const QString& startLine = "") const;
+    virtual QString toQString(const QString& startLine = "") const;
 };
 
 /*!
  * \brief Объединение (union), наследует CustomTypeWithFields.
  */
 struct Union : public CustomTypeWithFields {
-    Union(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
-    QString toQString(const QString& startLine = "") const;
+    explicit Union(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+    QString toQString(const QString& startLine = "") const override;
 };
 
 /*!
  * \brief Структура (struct), наследует CustomTypeWithFields.
  */
 struct Structure : public CustomTypeWithFields {
-    Structure(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
-    QString toQString(const QString& startLine = "") const;
+    explicit Structure(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+    QString toQString(const QString& startLine = "") const override;
 };
 
 /*!
  * \brief Класс (class), наследует CustomTypeWithFields.
  */
 struct Class : public CustomTypeWithFields {
-    Class(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
-    QString toQString(const QString& startLine = "") const;
+    explicit Class(const QString& name = "", const QHash<QString, Variable>& variables = {}, const QHash<QString, Function>& functions = {});
+    QString toQString(const QString& startLine = "") const override;
 };
 
 /*!
@@ -225,7 +224,7 @@ struct Enum {
     /*!
      * \brief Конструктор перечисления.
      */
-    Enum(const QString& name = "", const QHash<QString, QHash<Case, QString>>& values = {});
+    explicit Enum(const QString& name = "", const QHash<QString, QHash<Case, QString>>& values = {});
 
     /*!
      * \brief Преобразует перечисление в строку.

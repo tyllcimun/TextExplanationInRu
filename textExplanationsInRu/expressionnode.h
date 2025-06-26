@@ -17,7 +17,7 @@ public:
     /*!
      * \brief Конструктор по умолчанию.
      */
-    ExpressionNode();
+    explicit ExpressionNode();
 
     /*!
      * \brief Конструктор с параметрами.
@@ -29,7 +29,12 @@ public:
      * \param[in] operType Тип операции.
      * \param[in] functionArgs Аргументы функции (если применимо).
      */
-    ExpressionNode(EntityType nodeType, const QString& value,  ExpressionNode* left = nullptr, ExpressionNode* right = nullptr, const QString& dataType = "", OperationType operType = OperationType::None, QList<ExpressionNode*>* functionArgs = {});
+    explicit ExpressionNode(EntityType nodeType, const QString& value,
+                            ExpressionNode* left = nullptr,
+                            ExpressionNode* right = nullptr,
+                            const QString& dataType = "",
+                            OperationType operType = OperationType::None,
+                            QList<ExpressionNode*>* functionArgs = {});
 
     /*!
      * \brief Преобразует дерево выражения в строку.

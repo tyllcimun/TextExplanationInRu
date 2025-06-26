@@ -28,7 +28,7 @@ public:
      * \param[in] cls Классы.
      * \param[in] enms Перечисления (enum).
      */
-    Expression(
+    explicit Expression(
         const QString& expr = "",
         const QHash<QString, Variable>& vars = {},
         const QHash<QString, Function>& funcs = {},
