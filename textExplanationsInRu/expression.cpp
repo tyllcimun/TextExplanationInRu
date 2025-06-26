@@ -390,7 +390,7 @@ QString Expression::getExplanationInRu()
     QString explanation = "";
     if(!this->getExpression()->isEmpty() || !this->getAllNames().isEmpty()){
         // Преобразовать выражение в дерево
-        ExpressionNode* explanationTree = this->expressionToNodes();
+        const ExpressionNode* explanationTree = this->expressionToNodes();
         // Получить объяснение выражения
         QHash<Case, QString> intermediateDescription = {};
         explanation = this->toExplanation(explanationTree, intermediateDescription).value(Case::Nominative);
@@ -573,7 +573,7 @@ void Expression::processFunction(const QString& token, QStack<ExpressionNode*>& 
 
     if (funcDataType == "") {
         if (!nodeStack.empty()) {
-            ExpressionNode* rightSibling = nodeStack.top();
+            const ExpressionNode* rightSibling = nodeStack.top();
             if (i + 1 != tokens.end()) {
                 QString nextToken = *(i + 1);
                 if (nextToken == "." || nextToken == "->") {
@@ -614,7 +614,7 @@ void Expression::processFunction(const QString& token, QStack<ExpressionNode*>& 
 QString Expression::handleVariableTypeInference(const QString& token, QStack<ExpressionNode*>& nodeStack, const QStringList& tokens, QStringList::const_iterator i, QString& className) {
     QString dataType;
     if (!nodeStack.empty()) {
-        ExpressionNode* rightSibling = nodeStack.top();
+        const ExpressionNode* rightSibling = nodeStack.top();
         if (i + 1 != tokens.end()) {
             QString nextToken = *(i + 1);
             if (nextToken == "." || nextToken == "->") {
